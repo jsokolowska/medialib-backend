@@ -13,6 +13,25 @@
     <version>0.0.1</version>
     <name>repository</name>
     <description>repozytorium plików</description>
+
+    <repositories>
+        <repository>
+            <id>maven-public</id>
+            <url>http://localhost:1337/repository/maven-public/</url>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <url>
+                http://localhost:1337/repository/maven-releases/
+            </url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>http://localhost:1337/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
     <properties>
         <java.version>11</java.version>
     </properties>
