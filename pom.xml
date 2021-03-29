@@ -17,19 +17,19 @@
     <repositories>
         <repository>
             <id>maven-public</id>
-            <url>http://localhost:1337/repository/maven-public/</url>
+            <url>http://localhost:8081/repository/maven-public/</url>
         </repository>
     </repositories>
     <distributionManagement>
         <repository>
             <id>nexus-releases</id>
             <url>
-                http://localhost:1337/repository/maven-releases/
+                http://localhost:8081/repository/maven-releases/
             </url>
         </repository>
         <snapshotRepository>
             <id>nexus-snapshots</id>
-            <url>http://localhost:1337/repository/maven-snapshots/</url>
+            <url>http://localhost:8081/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
     <properties>
