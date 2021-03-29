@@ -16,6 +16,11 @@ pipeline{
 				sh "mvn test"
 			}
 		}
+		stage('Deploy to nexus') {
+			steps {
+				sh "mvn deploy:deploy"
+			}
+		}
 		stage('Deploy') {
 			steps {
 				sh "mvn heroku:deploy"
