@@ -18,7 +18,7 @@ pipeline{
 		}
 		stage('Deploy to nexus') {
 			steps {
-				sh "mvn deploy:deploy"
+				sh "mvn jar:jar deploy:deploy"
 			}
 		}
 		stage('Deploy') {
