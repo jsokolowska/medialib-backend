@@ -17,4 +17,10 @@ public class RepositoryApplication {
     public String hello() {
         return "Hello Word!";
     }
+    @RequestMapping("/hello")
+    public String hello2() {
+        return "Hello2 Word!";
+    }
 }
+
+
