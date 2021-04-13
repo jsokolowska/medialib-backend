@@ -12,6 +12,7 @@ pipeline{
 			    def pom = readMavenPom file: 'pom.xml'
                 // replace last number in version with Jenkins build number
                 echo pom.getVersion()
+                def version = "0.0.0-SNAPSHOT"
                 //def version = pom.version.replace("SNAPSHOT", ".${currentBuild.number}")
 			}
 				sh "mvn clean compile -Dversion=${version}"
