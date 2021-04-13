@@ -1,5 +1,8 @@
 pipeline{
 	agent any
+	def pom = readMavenPom file: 'pom.xml'
+    // replace last number in version with Jenkins build number
+    def version = pom.version.replace("SNAPSHOT", ".${currentBuild.number}")
 
     tools {
         maven 'M3'
@@ -8,9 +11,6 @@ pipeline{
 	stages {
 		stage('Build') {
 			steps {
-                def pom = readMavenPom file: 'pom.xml'
-                // replace last number in version with Jenkins build number
-                def version = pom.version.replace("SNAPSHOT", ".${currentBuild.number}")
 				sh "mvn clean compile -Dversion=${version}"
 			}
 		}
