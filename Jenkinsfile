@@ -13,7 +13,9 @@ pipeline{
                 // replace last number in version with Jenkins build number
                 def version = pom.version.replace("SNAPSHOT", "${currentBuild.number}")
                 echo "${version}"
-                sh "mvn clean compile -Dversion=${version}"
+                sh "mvn versions:set -DnewVersion=${version}"
+                sh "mvn -v"
+                sh "mvn clean compile"
 			}
 			}
 		}
