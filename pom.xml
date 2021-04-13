@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>pik</groupId>
-    <artifactId>mediaLib-backend</artifactId>
+    <artifactId>repository</artifactId>
     <version>0.0.SNAPSHOT</version>
     <name>repository</name>
     <description>repozytorium plików</description>

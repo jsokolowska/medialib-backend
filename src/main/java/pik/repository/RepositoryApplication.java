@@ -19,7 +19,7 @@ public class RepositoryApplication {
     }
     @RequestMapping("/hello")
     public String hello2() {
-        return "Hello2 Word!";
+        return "Hello2 Word2!";
     }
 }
 
