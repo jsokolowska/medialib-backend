@@ -8,7 +8,10 @@ pipeline{
 	stages {
 		stage('Build') {
 			steps {
-				sh "mvn clean compile"
+                def pom = readMavenPom file: 'pom.xml'
+                // replace last number in version with Jenkins build number
+                def version = pom.version.replace("SNAPSHOT", ".${currentBuild.number}")
+				sh "mvn clean compile -Dversion=${version}"
 			}
 		}
 		stage('Test') {
