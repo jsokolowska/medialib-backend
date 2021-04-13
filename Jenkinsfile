@@ -14,9 +14,11 @@ pipeline{
                 def version = pom.version.replace("0-SNAPSHOT", "${currentBuild.number}")
                 echo "${version}"
                 sh "mvn versions:set -DnewVersion=${version}"
-                sh "mvn -v"
-                sh "mvn clean compile"
+
 			}
+			withMaven(maven: 'M3', mavenSettingsConfig: 'mvn-setting-xml') {
+                          		sh "mvn clean compile"
+                      		}
 			}
 		}
 		stage('Test') {
