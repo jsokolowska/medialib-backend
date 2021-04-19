@@ -11,13 +11,14 @@ pipeline{
 			script {
 			    def pom = readMavenPom file: 'pom.xml'
                 // replace last number in version with Jenkins build number
-                def version = pom.version.replace("0-SNAPSHOT", "${currentBuild.number}")
-                echo "${version}"
-                sh "mvn versions:set -DnewVersion=${version}"
-                sh 'git config --global user.email "jenkins@example.com"'
-                sh  'git config --global user.name "JenkinsJob"'
-                sh 'git tag -a ${version} -m "Jenkins Job version update"'
-			}
+                version = pom.version.replace("0-SNAPSHOT", "${currentBuild.number}")
+            }
+            sh 'echo "${version}"'
+            sh "mvn versions:set -DnewVersion=${version}"
+            sh 'git config --global user.email "jenkins@example.com"'
+            sh  'git config --global user.name "JenkinsJob"'
+            sh 'echo "${version}"'
+            sh "git tag -a ${version} -m 'Jenkins Job version update'"
 			withMaven(maven: 'M3', mavenSettingsConfig: 'mvn-setting-xml') {
                           		sh "mvn clean compile"
                       		}
