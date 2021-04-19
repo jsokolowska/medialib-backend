@@ -19,6 +19,7 @@ pipeline{
             sh  'git config --global user.name "JenkinsJob"'
             sh 'echo "${version}"'
             sh "git tag -a ${version} -m 'Jenkins Job version update'"
+            sh 'git push origin -- tags'
 			withMaven(maven: 'M3', mavenSettingsConfig: 'mvn-setting-xml') {
                           		sh "mvn clean compile"
                       		}
@@ -43,7 +44,7 @@ pipeline{
 		}
 		stage ('Git push'){
 		    steps {
-		         sh 'git push -- tags HEAD:master'
+		         sh 'echo "Done"'
 		    }
 		}
 	}
