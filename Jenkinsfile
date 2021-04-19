@@ -50,7 +50,7 @@ pipeline{
 		}
 		stage ('Git push'){
 		    steps {
-		         sh 'git push -- tags'
+		         sh 'git push -- tags HEAD:<master>'
 		    }
 		}
 	}
