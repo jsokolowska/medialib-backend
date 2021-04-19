@@ -15,11 +15,11 @@ pipeline{
             }
             sh 'echo "${version}"'
             sh "mvn versions:set -DnewVersion=${version}"
-            sh 'git config --global user.email "jenkins@example.com"'
-            sh  'git config --global user.name "JenkinsJob"'
-            sh 'echo "${version}"'
-            sh "git tag -a ${version} -m 'Jenkins Job version update'"
-            sh 'git push origin -- tags'
+            //sh 'git config --global user.email "jenkins@example.com"'
+            //sh  'git config --global user.name "JenkinsJob"'
+            //sh 'echo "${version}"'
+            //sh "git tag -a ${version} -m 'Jenkins Job version update'"
+            //sh 'git push origin -- tags'
 			withMaven(maven: 'M3', mavenSettingsConfig: 'mvn-setting-xml') {
                           		sh "mvn clean compile"
                       		}
