@@ -45,19 +45,15 @@ pipeline{
 				sh "mvn heroku:deploy"
 			}
 		}
-	}
-	post{
-	    success{
-	        steps{
-	            script{
-	                 def pom = readMavenPom file: 'pom.xml'
-	                 sh 'git config --global user.email "jenkins@example.com"'
-                     sh  'git config --global user.name "JenkinsJob"'
-                     sh 'git tag -a ${version} -m "Jenkins Job version update"'
-                     sh 'git push -- tags'
-	            }
-
-	        }
-	    }
+		stage("Tag push"){
+		    steps{
+        	    script{
+        	        def pom = readMavenPom file: 'pom.xml'
+        	        sh 'git config --global user.email "jenkins@example.com"'
+                    sh  'git config --global user.name "JenkinsJob"'
+                    sh 'git tag -a ${version} -m "Jenkins Job version update"'
+                    sh 'git push -- tags'
+        	    }
+		    }
 	}
 }
