@@ -54,6 +54,7 @@ pipeline{
                     sh 'git tag -a ${version} -m "Jenkins Job version update"'
                     sh 'git push -- tags'
         	    }
-		    }
+        	}
+		}
 	}
 }
