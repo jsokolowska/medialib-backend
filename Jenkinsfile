@@ -12,6 +12,7 @@ pipeline{
 			    def pom = readMavenPom file: 'pom.xml'
                 // replace last number in version with Jenkins build number
                 def version = pom.version.replace("0-SNAPSHOT", "${currentBuild.number}")
+                sh 'echo "${version} > version.txt"'
                 echo "${version}"
                 sh "mvn versions:set -DnewVersion=${version}"
 
@@ -48,8 +49,7 @@ pipeline{
 		stage("Tag push"){
 		    steps{
         	    script{
-        	        def pom = readMavenPom file: 'pom.xml'
-        	        def version = pom.version
+        	        def version = readFile('version.txt').trim()
         	        sh 'echo ${version}'
         	        sh 'git config --global user.email "jenkins@example.com"'
                     sh  'git config --global user.name "JenkinsJob"'
