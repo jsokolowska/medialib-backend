@@ -12,11 +12,11 @@ pipeline{
 			    def pom = readMavenPom file: 'pom.xml'
                 // replace last number in version with Jenkins build number
                 def version = pom.version.replace("0-SNAPSHOT", "${currentBuild.number}")
-                file = new File ("version.txt")
-                file << version
                 echo "${version}"
                 sh "mvn versions:set -DnewVersion=${version}"
-
+                sh 'git config --global user.email "jenkins@example.com"'
+                sh  'git config --global user.name "JenkinsJob"'
+                sh 'git tag -a ${version} -m "Jenkins Job version update"'
 			}
 			withMaven(maven: 'M3', mavenSettingsConfig: 'mvn-setting-xml') {
                           		sh "mvn clean compile"
@@ -47,17 +47,10 @@ pipeline{
 				sh "mvn heroku:deploy"
 			}
 		}
-		stage("Tag push"){
-		    steps{
-        	    script{
-        	        def version = readFile('version.txt').trim()
-        	        sh 'echo ${version}'
-        	        sh 'git config --global user.email "jenkins@example.com"'
-                    sh  'git config --global user.name "JenkinsJob"'
-                    sh 'git tag -a ${version} -m "Jenkins Job version update"'
-                    sh 'git push -- tags'
-        	    }
-        	}
+		stage ('Git push'){
+		    steps {
+		         sh 'git push -- tags'
+		    }
 		}
 	}
 }
