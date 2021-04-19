@@ -51,7 +51,7 @@ pipeline{
         	        def pom = readMavenPom file: 'pom.xml'
         	        sh 'git config --global user.email "jenkins@example.com"'
                     sh  'git config --global user.name "JenkinsJob"'
-                    sh 'git tag -a ${version} -m "Jenkins Job version update"'
+                    sh 'git tag -a ${pom.version} -m "Jenkins Job version update"'
                     sh 'git push -- tags'
         	    }
         	}
