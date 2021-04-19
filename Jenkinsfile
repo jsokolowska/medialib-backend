@@ -36,13 +36,6 @@ pipeline{
 				}
 			}
 		}
-// 		stage('Deploy to nexus') {
-//         	steps {
-//         		withMaven(maven: 'M3', mavenSettingsConfig: 'mvn-setting-xml') {
-//               		sh "mvn jar:jar deploy:deploy"
-//           		}
-//     		}
-//         }
 		stage('Deploy') {
 			steps {
 				sh "mvn heroku:deploy"
@@ -50,7 +43,7 @@ pipeline{
 		}
 		stage ('Git push'){
 		    steps {
-		         sh 'git push -- tags HEAD:<master>'
+		         sh 'git push -- tags HEAD:master'
 		    }
 		}
 	}
