@@ -53,6 +53,11 @@
             <version>1.3-groovy-2.5</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <artifactId>spring-web</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>5.3.5</version>
+        </dependency>
 
     </dependencies>
 
