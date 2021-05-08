@@ -6,6 +6,6 @@ public interface MediaFileDAO {
     List<MediaFile> getAllUserFiles(String userId);
     MediaFile getMediaFile(String userId, String filename);
     MediaFile getMediaFileByDisplayName (String userId, String displayName);
-    void updateMediaFile(String userId, MediaFile file);
-    void deleteMediaFile(String userId,MediaFile file);
+    void updateMediaFile(MediaFile file);
+    void deleteMediaFile(MediaFile file);
 }

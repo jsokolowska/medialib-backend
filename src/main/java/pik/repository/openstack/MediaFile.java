@@ -8,9 +8,9 @@ public class MediaFile {
     private String fileId;
     private String url;
     private String displayName;
-    private long size;
+    private final long size;
 
-    public MediaFile(String userId, String type, String displayName, String url, String  fileId, long size) {
+    public MediaFile(String userId, String  fileId, String type, String displayName, String url, long size) {
         this.userId = userId;
         this.type = type;
         this.fileId = fileId;
@@ -19,26 +19,15 @@ public class MediaFile {
         this.size = size;
     }
 
-    public MediaFile(String userId, String type, String displayName, String url, String  fileId, long size, String dirPath) {
+    public MediaFile(String userId, String displayName, String  fileId) {
         this.userId = userId;
-        this.type = type;
         this.fileId = fileId;
         this.displayName = displayName;
-        this.size = size;
-        this.url = url;
+
+        this.type = "";
+        this.size = 0;
+        this.url = "";
     }
-
-    protected MediaFile (StoredObject obj, String userId){
-        this.userId = userId;
-        type = obj.getContentType();
-
-        fileId = obj.getName();
-
-        url = obj.getPublicURL();
-        displayName = obj.getName(); //should be either object metadata or namehash?
-        size = obj.getContentLength();
-    }
-
 
     public String getUserId() {
         return userId;
@@ -68,14 +57,28 @@ public class MediaFile {
         return displayName;
     }
 
+    public void setDisplayName(String displayName)
+    {
+        this.displayName = displayName;
+    }
+
     /**@return number of bytes used by this object*/
     public long getSize() {
         return size;
     }
 
-
     public String getUrl() {
         return url;
+    }
+
+    protected void setUrl(String url){
+        this.url = url;
+    }
+
+    @Override
+    public String toString (){
+        return "User:" + userId + "\n\tfileID:" + fileId + " displayName:" + displayName + " size:" + size +
+                " type:" + type + "\n\turl:" + url;
     }
 
 }
