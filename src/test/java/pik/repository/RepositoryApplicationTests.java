@@ -24,7 +24,6 @@ class RepositoryApplicationTests {
     @Test
     void contextLoads() throws Exception {
         this.mocMvc.perform(post("/api/login")
-                //.header("Authorization", base64ForTestUser)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\":\"ala\",\"hash\":12345}"))
                 .andDo(print())

@@ -18,9 +18,10 @@ public class RepositoryApplication {
 
     @RequestMapping(value="/api/login", method=RequestMethod.POST)
     public User login(@RequestBody Login dane) {
-        User uzytkownik = new User();
-        uzytkownik.email = dane.email;
-        uzytkownik.hash = dane.hash;
+        String email = dane.getEmail();
+        int hash = dane.getHash();
+        User uzytkownik = new User(email, hash, "Alicja", "Turowska");
+        uzytkownik.setToken("token");
         return uzytkownik;
     }
 }
