@@ -28,7 +28,7 @@ class RepositoryApplicationTests {
                 .content("{\"email\":\"ala\",\"password\":\"12345\"}"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"token\":\"token\",\"email\":\"ala\",\"password\":\"12345\",\"name\":\"Alicja\",\"surname\":\"Turowska\"}"));
+                .andExpect(content().json("{\"token\":\"token\"}"));
     }
 
 }

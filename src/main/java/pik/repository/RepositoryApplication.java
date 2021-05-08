@@ -17,12 +17,12 @@ public class RepositoryApplication {
     }
 
     @RequestMapping(value="/api/login", method=RequestMethod.POST)
-    public User login(@RequestBody Login dane) {
+    public String login(@RequestBody Login dane) {
         String email = dane.getEmail();
         String password = dane.getPassword();
         User user = new User(email, password, "Alicja", "Turowska");
         user.setToken("token");
-        return user;
+        return "{token:"+user.getToken()+"}";
     }
 }
 
