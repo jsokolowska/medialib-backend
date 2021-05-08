@@ -29,6 +29,12 @@ class RepositoryApplicationTests {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"token\":\"token\"}"));
+
+        this.mocMvc.perform(post("/api/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"ala\",\"password\":\"12345\",\"name\":\"alicja\", \"surname\":\"turowska\"}"))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 
 }

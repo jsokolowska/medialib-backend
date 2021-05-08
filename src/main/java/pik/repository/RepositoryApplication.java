@@ -16,13 +16,24 @@ public class RepositoryApplication {
         SpringApplication.run(RepositoryApplication.class, args);
     }
 
+    @RequestMapping("/")
+    public String hello(){
+        return "Hello!";
+    }
+
     @RequestMapping(value="/api/login", method=RequestMethod.POST)
-    public String login(@RequestBody Login dane) {
+    public String login(@RequestBody Login dane){
         String email = dane.getEmail();
         String password = dane.getPassword();
         User user = new User(email, password, "Alicja", "Turowska");
         user.setToken("token");
+        //obsluga logowania
         return "{token:"+user.getToken()+"}";
+    }
+
+    @RequestMapping(value="/api/signup", method=RequestMethod.POST)
+    public void register(@RequestBody Register dane){
+        //obsluga rejestracji
     }
 }
 
