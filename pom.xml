@@ -67,6 +67,12 @@
             <version>2.0-M4-groovy-3.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <artifactId>spring-web</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>5.3.5</version>
+        </dependency>
+
     </dependencies>
 
     <build>
