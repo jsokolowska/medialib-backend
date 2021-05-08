@@ -25,10 +25,10 @@ class RepositoryApplicationTests {
     void contextLoads() throws Exception {
         this.mocMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\":\"ala\",\"hash\":12345}"))
+                .content("{\"email\":\"ala\",\"password\":\"12345\"}"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"token\":\"token\",\"email\":\"ala\",\"hash\":12345,\"name\":\"Alicja\",\"surname\":\"Turowska\"}"));
+                .andExpect(content().json("{\"token\":\"token\",\"email\":\"ala\",\"password\":\"12345\",\"name\":\"Alicja\",\"surname\":\"Turowska\"}"));
     }
 
 }

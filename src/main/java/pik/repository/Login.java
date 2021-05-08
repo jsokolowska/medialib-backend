@@ -2,26 +2,26 @@ package pik.repository;
 
 public class Login {
     private String email;
-    private int hash;
+    private String password;
 
-    public Login(String email, int hash){
+    public Login(String email, String password){
         this.email = email;
-        this.hash = hash;
+        this.password = password;
     }
 
     public void setEmail(String email){
         this.email = email;
     }
 
-    public void setHash(int hash){
-        this.hash = hash;
+    public void setPassword(String password){
+        this.password = password;
     }
 
     public String getEmail(){
         return this.email;
     }
 
-    public int getHash(){
-        return this.hash;
+    public String getPassword(){
+        return this.password;
     }
 }

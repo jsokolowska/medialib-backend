@@ -1,16 +1,16 @@
 package pik.repository;
 
 public class User {
-    private String token = "token";
+    private String token;
     private String email;
-    private int hash;
+    private String password;
     private String name;
     private String surname;
 
-    public User(String email, int hash, String name, String surname){
+    public User(String email, String password, String name, String surname){
       this.token = "";
       this.email = email;
-      this.hash = hash;
+      this.password = password;
       this.name = name;
       this.surname = surname;
     };
@@ -23,8 +23,8 @@ public class User {
         this.email = email;
     }
 
-    public void setHash(int hash){
-        this.hash =hash;
+    public void setPassword(String password){
+        this.password =password;
     }
 
     public void setName(String name){
@@ -43,8 +43,8 @@ public class User {
         return this.email;
     }
 
-    public int getHash(){
-        return this.hash;
+    public String getPassword(){
+        return this.password;
     }
 
     public String getName(){
