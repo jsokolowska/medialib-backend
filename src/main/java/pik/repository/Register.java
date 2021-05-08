@@ -1,9 +1,16 @@
 package pik.repository;
 
+import javax.validation.constraints.NotEmpty;
+
 public class Register {
+
+    @NotEmpty
     private String email;
+    @NotEmpty
     private String password;
+    @NotEmpty
     private String name;
+    @NotEmpty
     private String surname;
 
     public String getEmail(){
