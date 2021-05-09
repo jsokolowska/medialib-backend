@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
+import org.springframework.http.MediaType;
 
 
 @RestController
@@ -27,7 +28,7 @@ public class RepositoryApplication {
         return "Hello!";
     }
 
-    @RequestMapping(value="/api/login", method=RequestMethod.POST)
+    @RequestMapping(value="/api/login", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity login(@RequestBody @Valid Login dane){
         String email = dane.getEmail();
         String password = dane.getPassword();
@@ -38,7 +39,7 @@ public class RepositoryApplication {
         return ResponseEntity.ok("{\"token\":\""+user.getToken()+"\"}");
     }
 
-    @RequestMapping(value="/api/signup", method=RequestMethod.POST)
+    @RequestMapping(value="/api/signup", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity register(@RequestBody @Valid Register dane){
         //obsluga rejestracji
         return ResponseEntity.ok("");
