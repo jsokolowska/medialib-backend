@@ -35,7 +35,7 @@ public class RepositoryApplication {
         user.setToken("token");
         //obsluga logowania
 
-        return ResponseEntity.ok("{token:"+user.getToken()+"}");
+        return ResponseEntity.ok("{\"token\":\""+user.getToken()+"\"}");
     }
 
     @RequestMapping(value="/api/signup", method=RequestMethod.POST)
