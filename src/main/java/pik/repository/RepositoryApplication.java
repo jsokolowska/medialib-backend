@@ -5,11 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import org.springframework.http.MediaType;
@@ -23,11 +19,7 @@ public class RepositoryApplication {
         SpringApplication.run(RepositoryApplication.class, args);
     }
 
-    @RequestMapping("/")
-    public String hello(){
-        return "Hello!";
-    }
-
+    @CrossOrigin
     @RequestMapping(value="/api/login", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity login(@RequestBody @Valid Login dane){
         String email = dane.getEmail();
@@ -39,6 +31,7 @@ public class RepositoryApplication {
         return ResponseEntity.ok("{\"token\":\""+user.getToken()+"\"}");
     }
 
+    @CrossOrigin
     @RequestMapping(value="/api/signup", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity register(@RequestBody @Valid Register dane){
         //obsluga rejestracji
