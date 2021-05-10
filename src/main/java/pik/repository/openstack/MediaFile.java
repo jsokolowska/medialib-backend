@@ -81,4 +81,13 @@ public class MediaFile {
                 " type:" + type + "\n\turl:" + url;
     }
 
+    public String toJson (){
+        return "{" +
+                "\"type\": \"" + type + "\"," +
+                "\"fileId\": \"" + fileId + "\"," +
+                "\"url\": \"" + url + "\"," +
+                "\"displayName\": \"" + displayName + "\"," +
+                "\"size\": \"" + size + "\"}";
+    }
+
 }

@@ -90,6 +90,7 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
     }
 
     /** Creates new entry in Swift database */
+    @Override
     public void uploadMediaFile(MediaFile file, File resource){
         Container container = account.getContainer(file.getUserId());
         if(!container.exists()){
