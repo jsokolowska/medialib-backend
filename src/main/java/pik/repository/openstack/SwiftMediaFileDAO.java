@@ -51,6 +51,29 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         if (!object.exists()) return null;
         return storedObjectToMediaFile(object, userId);
     }
+    public void makeSomeFiles (){
+        Container container = account.getContainer("mock-user");
+        if(!container.exists()){
+            container.create();
+            container.makePublic();}
+
+            MediaFile file =  new MediaFile("mock-user", "mock1","mock1id.gif");
+            uploadMediaFile(file, new File("src/test/resources/objects/test-gif.gif"));
+
+
+            file =  new MediaFile("mock-user", "mock2","mock2id.jpg");
+            uploadMediaFile(file, new File("src/test/resources/objects/test-img1.jpg"));
+
+           file =  new MediaFile("mock-user", "mock3","mock3id.jpeg");
+            uploadMediaFile(file, new File("src/test/resources/objects/test-img2.jpeg"));
+
+            file =  new MediaFile("mock-user", "mock4","mock4id.png");
+            uploadMediaFile(file, new File("src/test/resources/objects/test-img3.png"));
+
+            file =  new MediaFile("mock-user", "mock5","mock5id.mp4");
+            uploadMediaFile(file, new File("src/test/resources/objects/test-video.mp4"));
+
+    }
 
     /** @return first file with specified displayName or null if such file does not exist*/
     @Override

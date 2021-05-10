@@ -50,7 +50,6 @@ class SwiftMediaFileDAOSpec extends Specification {
         assert files_listed.find {it -> it.getFileId() == names[0]}
         assert files_listed.find {it -> it.getFileId() == names[1]}
         assert files_listed.find {it -> it.getFileId() == names[2]}
-
     }
 
     def "Should allow for display name to change"(){

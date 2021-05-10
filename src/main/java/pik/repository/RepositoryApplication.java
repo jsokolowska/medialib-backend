@@ -55,12 +55,16 @@ public class RepositoryApplication {
     //@RequestMapping(value = "/api/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/api/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAllImages(@PathVariable String userId ){      //, @RequestHeader(HEADER_TOKEN) String token){
-        if(userId.equals("1") ){    //when tokens work: loginUsers.checkUser(userId, token)
+        if(!userId.equals("error") ){    //when tokens work: loginUsers.checkUser(userId, token)
             List<MediaFile> all = mediaFileDAO.getAllUserFiles(userId);
+            if(all == null) return ResponseEntity.ok("{ \"files\": []}");
+            if(all.size() == 0) return ResponseEntity.ok("{ \"files\": []}");
             StringBuilder response = new StringBuilder("{ \"files\": [");
 
             for (int i =0; i<all.size()-1; i++){
                 response.append(all.get(i).toJson());
+                System.out.println(all.get(i).toJson());
+                System.out.println("Display name: " + all.get(0).getDisplayName());
                 response.append(",");
             }
             response.append(all.get(all.size()-1).toJson());
