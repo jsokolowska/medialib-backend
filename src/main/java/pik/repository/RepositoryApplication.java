@@ -2,7 +2,6 @@ package pik.repository;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +18,8 @@ import java.util.List;
 @SpringBootApplication
 public class RepositoryApplication {
 
+    private LoginUsers loginUsers;
+
     private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
 
     public static void main(String[] args) {
@@ -28,19 +29,24 @@ public class RepositoryApplication {
     @CrossOrigin
     @RequestMapping(value="/api/login", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity login(@RequestBody @Valid Login dane){
+        //tego nie będzie
         String email = dane.getEmail();
         String password = dane.getPassword();
-        User user = new User(email, password, "Alicja", "Turowska");
-        user.setToken("token");
-        //obsluga logowania
+        String token = "token";
+        //obsluga logowania:
 
-        return ResponseEntity.ok("{\"token\":\""+user.getToken()+"\"}");
+        //odczytać z bazy czy jest użytkownik o podanym emailu i haśle
+
+        //jeśli jest to odkomentować to co jest niżej
+        //String token = loginUsers.addUser(email);
+
+        return ResponseEntity.ok("{\"token\":\""+token+"\"}");
     }
 
     @CrossOrigin
     @RequestMapping(value="/api/signup", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity register(@RequestBody @Valid Register dane){
-        //obsluga rejestracji
+    public ResponseEntity register(@RequestBody @Valid UserDate dane){
+        //obsluga rejestracji: sprzwdzić czy istnieje, jeśli nie to dodać
         return ResponseEntity.ok("");
     }
 
