@@ -20,7 +20,6 @@ import java.util.List;
 public class RepositoryApplication {
 
     private static final LoginUsers loginUsers = new LoginUsers();
-
     private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
     private static final String HEADER_TOKEN = "X-API-TOKEN";
 

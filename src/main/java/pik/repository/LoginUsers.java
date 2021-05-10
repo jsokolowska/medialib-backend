@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class LoginUsers {
-    private Map<String, String> loginUser = new TreeMap<>();
+    private final Map<String, String> loginUser = new TreeMap<>();
     public String getToken(String email){
         String token = loginUser.get(email);
         if(token==null){
@@ -14,10 +14,7 @@ public class LoginUsers {
     }
     public boolean checkUser(String email, String token){
         String userToken = loginUser.get(email);
-        if(userToken==null || !userToken.equals(token)){
-            return false;
-        }
-        return true;
+        return userToken != null && userToken.equals(token);
     }
     public String addUser(String email){
         String token = generateToken(email);

@@ -13,7 +13,7 @@ public class User {
       this.password = password;
       this.name = name;
       this.surname = surname;
-    };
+    }
 
     public void setToken(String token){
         this.token = token;

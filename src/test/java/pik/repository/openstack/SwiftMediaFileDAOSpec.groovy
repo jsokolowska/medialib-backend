@@ -4,17 +4,17 @@ package pik.repository.openstack
 import spock.lang.Specification
 
 class SwiftMediaFileDAOSpec extends Specification {
-    def swiftDAO = new SwiftMediaFileDAO();
-    def username = "testuser";
+    def swiftDAO = new SwiftMediaFileDAO()
+    def username = "testuser"
     def resDir = "src/test/resources/objects/"
 
     def "Should add different types of resources"(){
         given:
         def mediaFile = new MediaFile(username, name, name)
-        def storedObj;
+        def storedObj
 
         when:
-        swiftDAO.uploadMediaFile(mediaFile, new File(resDir + name));
+        swiftDAO.uploadMediaFile(mediaFile, new File(resDir + name))
         storedObj = swiftDAO.getMediaFile(username, name)
 
         then:
@@ -30,8 +30,8 @@ class SwiftMediaFileDAOSpec extends Specification {
 
     def listAllSetup(String [] filenames){
         for (int i=0; i<filenames.size(); i++){
-            def medium = new MediaFile(username, filenames[i], filenames[i]);
-            def file = new File(resDir + filenames[i]);
+            def medium = new MediaFile(username, filenames[i], filenames[i])
+            def file = new File(resDir + filenames[i])
             swiftDAO.uploadMediaFile(medium, file)
         }
     }
@@ -40,10 +40,10 @@ class SwiftMediaFileDAOSpec extends Specification {
         given: "some sample files"
         String [] names= ["test-gif.gif", "test-img1.jpg", "test-img2.jpeg"]
         listAllSetup(names)
-        def files_listed;
+        def files_listed
 
         when: "all files by this user are queried"
-        files_listed = swiftDAO.getAllUserFiles(username);
+        files_listed = swiftDAO.getAllUserFiles(username)
 
         then: "list should contain files with matching file ids"
         files_listed.size() == 3
@@ -71,8 +71,8 @@ class SwiftMediaFileDAOSpec extends Specification {
 
     def displayNameChangeSetup(String [] filenames, String [] displayNames){
         for (int i=0; i<filenames.size(); i++){
-            def medium = new MediaFile(username, displayNames[i], filenames[i]);
-            def file = new File(resDir + filenames[i]);
+            def medium = new MediaFile(username, displayNames[i], filenames[i])
+            def file = new File(resDir + filenames[i])
             swiftDAO.uploadMediaFile(medium, file)
         }
     }
