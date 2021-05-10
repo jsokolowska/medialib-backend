@@ -27,8 +27,7 @@ class RepositoryApplicationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\":\"ala\",\"password\":\"12345\"}"))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"token\":\"token\"}"));
+                .andExpect(status().isOk());
 
         this.mocMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
