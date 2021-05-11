@@ -2,7 +2,7 @@ package pik.repository;
 
 import javax.validation.constraints.NotEmpty;
 
-public class UserDate {
+public class UserData {
 
     @NotEmpty
     private String email;
@@ -13,7 +13,7 @@ public class UserDate {
     @NotEmpty
     private String surname;
 
-    public UserDate(String email, String password, String name, String surname){
+    public UserData(String email, String password, String name, String surname){
        this.email = email;
        this.password = password;
        this.name = name;

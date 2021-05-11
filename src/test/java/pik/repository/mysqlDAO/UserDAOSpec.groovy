@@ -1,5 +1,6 @@
 package pik.repository.mysqlDAO
 
+import pik.repository.User
 import pik.repository.mysqlDAOs.UserDAO
 import spock.lang.Specification
 
@@ -91,5 +92,63 @@ class UserDAOSpec extends Specification {
         System.out.println(userSalt)
         userPasswStuff.get("passwHash") == userPasswHash
         userPasswStuff.get("salt") == userSalt
+    }
+
+    def "Test password matching refactorized"() {
+        given:
+        def userDao = new UserDAO()
+
+        when:
+        def result = userDao.isPasswordMatch("bfend9@gmpg.org", "77Ila32PlRdi")
+
+        then:
+        result == true
+    }
+
+    def "Test all users info"() {
+        given:
+        def userDao = new UserDAO()
+
+        when:
+        def result = userDao.getAllUserInfo("bfend9@gmpg.org")
+
+        then:
+        result.getEmail() == "bfend9@gmpg.org"
+        result.getName() == "Bartolomeo"
+        result.getSurname() == "Fend"
+    }
+
+    def "Test user existance"() {
+        given:
+        def userDao = new UserDAO()
+
+        when:
+        def resultExists = userDao.isUserExist("gscoyles3@blogger.com")
+        def resultDoesntExist = userDao.isUserExist("ronnyosullivan@logger.com")
+
+        then:
+        resultExists
+        !resultDoesntExist
+    }
+
+    def "Test full modification user"() {
+
+        given:
+        def userDao = new UserDAO()
+        def initialEmail = "jriddoch7@twitter.com"
+        def newEmail = "jriddoch7@gmail.com"
+        def newName = "Jonasz"
+        def newSurname = "Riddach"
+
+        when:
+        userDao.modifyAllData(initialEmail, newName, newSurname, newEmail)
+        def assignedName = userDao.getUserName(newEmail)
+        def assignedSurname = userDao.getLastName(newEmail)
+
+
+        then:
+        assignedName == newName
+        assignedSurname == newSurname
+
     }
 }

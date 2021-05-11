@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 
 
 import org.apache.commons.codec.binary.Hex;
+import pik.repository.User;
 
 
 public class UserDAO {
@@ -31,6 +32,50 @@ public class UserDAO {
         );
     }
 
+    public boolean isPasswordMatch(String email, String password) throws Exception {
+
+        String hashedFromDB = getPasswordHash(email);
+        String saltFromDB = getSalt(email);
+        HashMap<String, String> hashed = hashPassword(password, saltFromDB);
+        String hashedPassword = hashed.get("passwHash");
+
+        return hashedPassword.equals(hashedFromDB);
+    }
+
+
+
+    public boolean isUserExist(String email) throws Exception {
+
+        Statement statement = this.connection.createStatement();
+        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+
+        ResultSet rs = statement.executeQuery(queryString);
+
+        return rs.next();
+    }
+
+
+
+    public User getAllUserInfo(String email) throws Exception {
+
+        Statement statement = this.connection.createStatement();
+        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        ResultSet rs = statement.executeQuery(queryString);
+
+        String name = null;
+        String surname = null;
+        String userEmail = null;
+
+        if (rs.next()) {
+            name = rs.getString("first_name");
+            surname = rs.getString("last_name");
+            userEmail = rs.getString("email");
+        }
+
+        return new User(userEmail, name, surname);
+    }
+
+
     public int getCount() throws Exception {
         Statement statement = this.connection.createStatement();
         String queryString = "SELECT COUNT(*) AS count FROM users";
@@ -44,6 +89,56 @@ public class UserDAO {
 
         return max;
     }
+
+
+
+    public String getSalt(String email) throws Exception {
+
+        Statement statement = this.connection.createStatement();
+        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        ResultSet rs = statement.executeQuery(queryString);
+
+        String salt = null;
+
+        if (rs.next()) {
+            salt = rs.getString("seed");
+        }
+
+        return salt;
+    }
+
+
+
+    public String getUserName(String email) throws Exception {
+
+        Statement statement = this.connection.createStatement();
+        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        ResultSet rs = statement.executeQuery(queryString);
+
+        String username = null;
+
+        if (rs.next()) {
+            username = rs.getString("first_name");
+        }
+        return username;
+    }
+
+
+
+    public String getLastName(String email) throws Exception {
+
+        Statement statement = this.connection.createStatement();
+        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        ResultSet rs = statement.executeQuery(queryString);
+
+        String lastName = null;
+        if (rs.next()) {
+            lastName = rs.getString("last_name");
+        }
+        return lastName;
+    }
+
+
 
     public HashMap<String, String> hashPassword(String password, String hexSalt) throws Exception {
 
@@ -63,6 +158,8 @@ public class UserDAO {
 
         return passwStuff;
     }
+
+
 
 
     public void insertUser(String firstName, String lastName, String email, String password) throws Exception {
@@ -91,6 +188,9 @@ public class UserDAO {
         statement.executeQuery("commit;");
     }
 
+
+
+
     public String getPasswordHash(String email) throws Exception {
 
         Statement statement = this.connection.createStatement();
@@ -105,60 +205,32 @@ public class UserDAO {
         return hash;
     }
 
-    public String getSalt(String email) throws Exception {
-
-        Statement statement = this.connection.createStatement();
-        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
-        ResultSet rs = statement.executeQuery(queryString);
-
-        String salt = null;
-
-        if (rs.next()) {
-            salt = rs.getString("seed");
-        }
-
-        return salt;
-    }
-
-    public String getUserName(String email) throws Exception {
-
-        Statement statement = this.connection.createStatement();
-        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
-        ResultSet rs = statement.executeQuery(queryString);
-
-        String username = null;
-
-        if (rs.next()) {
-            username = rs.getString("first_name");
-        }
-        return username;
-    }
-
-    public String getLastName(String email) throws Exception {
-
-        Statement statement = this.connection.createStatement();
-        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
-        ResultSet rs = statement.executeQuery(queryString);
-
-        String lastName = null;
-        if (rs.next()) {
-            lastName = rs.getString("last_name");
-        }
-        return lastName;
-    }
-
 
     public void modifyUserEmail(String email, String newEmail) throws Exception {
-
         String queryString = "UPDATE users SET email = ? WHERE email = ?";
 
-        PreparedStatement statement = connection.prepareStatement(queryString);
+        PreparedStatement statement = this.connection.prepareStatement(queryString);
         statement.setString(1, newEmail);
         statement.setString(2, email);
 
         statement.execute();
+    }
+
+    public void modifyAllData(String email, String name, String surname, String newEmail) throws Exception {
+
+        String queryString = "UPDATE users SET email = ?, first_name = ?, last_name = ? WHERE email = ?";
+
+        PreparedStatement statement = this.connection.prepareStatement(queryString);
+        statement.setString(1, newEmail);
+        statement.setString(2, name);
+        statement.setString(3, surname);
+        statement.setString(4, email);
+
+        statement.execute();
 
     }
+
+
 
     public void deleteUser(String email) throws Exception {
 
@@ -167,6 +239,8 @@ public class UserDAO {
         statement.execute(queryString);
         statement.execute("commit;");
     }
+
+
 
     public void close() throws Exception {
         this.connection.close();

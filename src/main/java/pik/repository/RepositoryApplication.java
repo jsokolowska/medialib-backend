@@ -46,7 +46,7 @@ public class RepositoryApplication {
 
     @CrossOrigin
     @RequestMapping(value="/api/signup", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity register(@RequestBody @Valid UserDate dane){
+    public ResponseEntity register(@RequestBody @Valid UserData dane){
         //obsluga rejestracji: sprzwdzić czy istnieje, jeśli nie to dodać
         return ResponseEntity.ok("");
     }
