@@ -15,6 +15,12 @@ public class User {
       this.surname = surname;
     }
 
+    public User(String email, String name, String surname) {
+        this.email = email;
+        this.name = name;
+        this.surname = surname;
+    }
+
     public void setToken(String token){
         this.token = token;
     }
