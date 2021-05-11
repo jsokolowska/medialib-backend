@@ -22,7 +22,7 @@ public class RepositoryApplication {
 
     private static final LoginUsers loginUsers = new LoginUsers();
     private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
-//    private static final UserDAO userDAO = new UserDAO();
+    private static final UserDAO userDAO = new UserDAO();
 
     private static final String HEADER_TOKEN = "X-API-TOKEN";
 
@@ -35,24 +35,24 @@ public class RepositoryApplication {
     public ResponseEntity login(@RequestBody @Valid Login dane){
         String email = dane.getEmail();
         String password = dane.getPassword();
-/*        if(!userDAO.isUserExist(email)){
+        if(!userDAO.isUserExist(email)){
             return ResponseEntity.notFound().build();
         }
         if(!userDAO.isPasswordMatch(email, password)){
             return ResponseEntity.status(401).body("error password");
         }
-*/        String token = loginUsers.addUser(email);
+        String token = loginUsers.addUser(email);
         return ResponseEntity.ok("{\"token\":\""+token+"\"}");
     }
 
     @CrossOrigin
     @RequestMapping(value="/api/signup", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity register(@RequestBody @Valid UserData dane){
-/*        if(userDAO.isUserExist(dane.getEmail())){
+        if(userDAO.isUserExist(dane.getEmail())){
             return ResponseEntity.status(401).body("just exist");
         }
         userDAO.insertUser(dane.getName(), dane.getSurname(), dane.getEmail(), dane.getPassword());
-*/        return ResponseEntity.ok("");
+        return ResponseEntity.ok("");
     }
 
     @CrossOrigin

@@ -5,13 +5,17 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
 
+import org.apache.commons.codec.Decoder;
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import pik.repository.User;
 
@@ -19,72 +23,112 @@ import pik.repository.User;
 public class UserDAO {
 
     private final String DRIVER_STRING = "com.mysql.cj.jdbc.Driver";
-    private final Connection connection;
+    private Connection connection;
 
-    public UserDAO() throws Exception {
+    public UserDAO() {
 
         ResourceBundle bundle = ResourceBundle.getBundle("mysql");
-        Class.forName(DRIVER_STRING);
-        this.connection = DriverManager.getConnection(
-                bundle.getString("connection_string"),
-                bundle.getString("mysql-user"),
-                bundle.getString("mysql-password")
-        );
+
+        try {
+            Class.forName(DRIVER_STRING);
+            this.connection = DriverManager.getConnection(
+                    bundle.getString("connection_string"),
+                    bundle.getString("mysql-user"),
+                    bundle.getString("mysql-password")
+            );
+        } catch (Exception e) {
+            System.out.println("Can't connect to the database");
+            System.out.println(e);
+        }
     }
 
-    public boolean isPasswordMatch(String email, String password) throws Exception {
+    public boolean isPasswordMatch(String email, String password) {
+        String hashedFromDB = null;
+        String saltFromDB = null;
+        HashMap<String,String> hashed;
 
-        String hashedFromDB = getPasswordHash(email);
-        String saltFromDB = getSalt(email);
-        HashMap<String, String> hashed = hashPassword(password, saltFromDB);
-        String hashedPassword = hashed.get("passwHash");
+        String hashedPassword = null;
+        boolean passwordsEqual = false;
 
-        return hashedPassword.equals(hashedFromDB);
+        try {
+            hashedFromDB = getPasswordHash(email);
+            saltFromDB = getSalt(email);
+            hashed = hashPassword(password, saltFromDB);
+            hashedPassword = hashed.get("passwHash");
+
+            passwordsEqual = hashedPassword.equals(hashedFromDB);
+        } catch (Exception e) {
+            System.out.println("An error occured while comparing passwords");
+            System.out.println(e);
+        }
+        return passwordsEqual;
     }
 
 
 
-    public boolean isUserExist(String email) throws Exception {
+    public boolean isUserExist(String email) {
 
-        Statement statement = this.connection.createStatement();
-        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        boolean exists = false;
+        try {
+            Statement statement = this.connection.createStatement();
+            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
 
-        ResultSet rs = statement.executeQuery(queryString);
+            ResultSet rs = statement.executeQuery(queryString);
+            exists = rs.next();
+        } catch (Exception e) {
+            System.out.println("An error getting user from the database");
+            System.out.println(e);
+        }
 
-        return rs.next();
+        return exists;
     }
 
 
 
-    public User getAllUserInfo(String email) throws Exception {
+    public User getAllUserInfo(String email) {
 
-        Statement statement = this.connection.createStatement();
-        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
-        ResultSet rs = statement.executeQuery(queryString);
 
         String name = null;
         String surname = null;
         String userEmail = null;
 
-        if (rs.next()) {
-            name = rs.getString("first_name");
-            surname = rs.getString("last_name");
-            userEmail = rs.getString("email");
+        try {
+            Statement statement = this.connection.createStatement();
+            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+            ResultSet rs = statement.executeQuery(queryString);
+
+
+            if (rs.next()) {
+                name = rs.getString("first_name");
+                surname = rs.getString("last_name");
+                userEmail = rs.getString("email");
+            }
+        } catch (Exception e) {
+            System.out.println("An error getting user info from database");
+            System.out.println(e);
         }
+
 
         return new User(userEmail, name, surname);
     }
 
 
-    public int getCount() throws Exception {
-        Statement statement = this.connection.createStatement();
-        String queryString = "SELECT COUNT(*) AS count FROM users";
-        ResultSet rs = statement.executeQuery(queryString);
+    public int getCount()  {
 
         int max = -1;
 
-        if (rs.next()) {
-            max = rs.getInt("count");
+        try {
+            Statement statement = this.connection.createStatement();
+            String queryString = "SELECT COUNT(*) AS count FROM users";
+            ResultSet rs = statement.executeQuery(queryString);
+
+
+            if (rs.next()) {
+                max = rs.getInt("count");
+            }
+        } catch (Exception e) {
+            System.out.println("Error counting users");
+            System.out.println(e);
         }
 
         return max;
@@ -92,16 +136,21 @@ public class UserDAO {
 
 
 
-    public String getSalt(String email) throws Exception {
-
-        Statement statement = this.connection.createStatement();
-        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
-        ResultSet rs = statement.executeQuery(queryString);
+    public String getSalt(String email) {
 
         String salt = null;
 
-        if (rs.next()) {
-            salt = rs.getString("seed");
+        try {
+            Statement statement = this.connection.createStatement();
+            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+            ResultSet rs = statement.executeQuery(queryString);
+
+            if (rs.next()) {
+                salt = rs.getString("seed");
+            }
+        } catch (Exception e) {
+            System.out.println("An error getting salt from the user");
+            System.out.println(e);
         }
 
         return salt;
@@ -111,14 +160,19 @@ public class UserDAO {
 
     public String getUserName(String email) throws Exception {
 
-        Statement statement = this.connection.createStatement();
-        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
-        ResultSet rs = statement.executeQuery(queryString);
-
         String username = null;
+        try {
+            Statement statement = this.connection.createStatement();
+            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+            ResultSet rs = statement.executeQuery(queryString);
 
-        if (rs.next()) {
-            username = rs.getString("first_name");
+
+            if (rs.next()) {
+                username = rs.getString("first_name");
+            }
+        } catch (Exception e) {
+            System.out.println("Error getting the name of the user");
+            System.out.println(e);
         }
         return username;
     }
@@ -127,32 +181,57 @@ public class UserDAO {
 
     public String getLastName(String email) throws Exception {
 
-        Statement statement = this.connection.createStatement();
-        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
-        ResultSet rs = statement.executeQuery(queryString);
-
         String lastName = null;
-        if (rs.next()) {
-            lastName = rs.getString("last_name");
+
+        try {
+            Statement statement = this.connection.createStatement();
+            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+            ResultSet rs = statement.executeQuery(queryString);
+
+
+            if (rs.next()) {
+                lastName = rs.getString("last_name");
+            }
+        } catch (Exception e) {
+            System.out.println("Error getting user's last name");
+            System.out.println(e);
         }
         return lastName;
     }
 
 
 
-    public HashMap<String, String> hashPassword(String password, String hexSalt) throws Exception {
+    public HashMap<String, String> hashPassword(String password, String hexSalt) {
 
-        byte[] byteSalt = Hex.decodeHex(hexSalt.toCharArray());
+        String strSalt = null;
+        String strHash = null;
+        HashMap<String, String> passwStuff;
+        byte[] byteSalt = null;
+        byte[] hash = null;
 
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), byteSalt, 1000, 512);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        try {
+            byteSalt = Hex.decodeHex(hexSalt.toCharArray());
 
-        byte[] hash = factory.generateSecret(spec).getEncoded();
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), byteSalt, 1000, 512);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
 
-        String strHash = Hex.encodeHexString(hash);
-        String strSalt = Hex.encodeHexString(byteSalt);
+            hash = factory.generateSecret(spec).getEncoded();
+        } catch (DecoderException decExc) {
+            System.out.println("Error decoding salt");
+            System.out.println(decExc);
+        } catch (NoSuchAlgorithmException noAlgoExc) {
+            System.out.println("Error finding hashing algorithm");
+            System.out.println(noAlgoExc);
+        } catch (InvalidKeySpecException invalidKeyExc) {
+            System.out.println("Error finding key");
+            System.out.println(invalidKeyExc);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        strHash = Hex.encodeHexString(hash);
+        strSalt = Hex.encodeHexString(byteSalt);
 
-        HashMap<String, String> passwStuff = new HashMap<>();
+        passwStuff = new HashMap<>();
         passwStuff.put("passwHash", strHash);
         passwStuff.put("salt", strSalt);
 
@@ -162,7 +241,7 @@ public class UserDAO {
 
 
 
-    public void insertUser(String firstName, String lastName, String email, String password) throws Exception {
+    public void insertUser(String firstName, String lastName, String email, String password) {
 
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[32];
@@ -174,76 +253,104 @@ public class UserDAO {
         String passwordHash = passwStuff.get("passwHash");
         String strSalt = passwStuff.get("salt");
 
+        try {
 
-        String queryString = "INSERT INTO users(first_name, last_name, email, password_hash, seed) VALUES (?, ?, ?, ?, ?)";
+            String queryString = "INSERT INTO users(first_name, last_name, email, password_hash, seed) VALUES (?, ?, ?, ?, ?)";
 
-        PreparedStatement statement = connection.prepareStatement(queryString);
-        statement.setString(1, firstName);
-        statement.setString(2, lastName);
-        statement.setString(3, email);
-        statement.setString(4, passwordHash);
-        statement.setString(5, strSalt);
+            PreparedStatement statement = connection.prepareStatement(queryString);
+            statement.setString(1, firstName);
+            statement.setString(2, lastName);
+            statement.setString(3, email);
+            statement.setString(4, passwordHash);
+            statement.setString(5, strSalt);
 
-        statement.execute();
-        statement.executeQuery("commit;");
+            statement.execute();
+            statement.executeQuery("commit;");
+        } catch (SQLException ex) {
+            System.out.println("An exception while inserting user occured");
+            System.out.println(ex);
+        }
     }
 
 
 
 
-    public String getPasswordHash(String email) throws Exception {
-
-        Statement statement = this.connection.createStatement();
-        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
-        ResultSet rs = statement.executeQuery(queryString);
+    public String getPasswordHash(String email) {
 
         String hash = null;
+        try {
+            Statement statement = this.connection.createStatement();
+            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+            ResultSet rs = statement.executeQuery(queryString);
 
-        if (rs.next()) {
-            hash = rs.getString("password_hash");
+
+            if (rs.next()) {
+                hash = rs.getString("password_hash");
+            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
         return hash;
     }
 
 
-    public void modifyUserEmail(String email, String newEmail) throws Exception {
-        String queryString = "UPDATE users SET email = ? WHERE email = ?";
+    public void modifyUserEmail(String email, String newEmail) {
 
-        PreparedStatement statement = this.connection.prepareStatement(queryString);
-        statement.setString(1, newEmail);
-        statement.setString(2, email);
+        try {
+            String queryString = "UPDATE users SET email = ? WHERE email = ?";
 
-        statement.execute();
+            PreparedStatement statement = this.connection.prepareStatement(queryString);
+            statement.setString(1, newEmail);
+            statement.setString(2, email);
+
+            statement.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex);
+        }
     }
 
-    public void modifyAllData(String email, String name, String surname, String newEmail) throws Exception {
+    public void modifyAllData(String email, String name, String surname, String newEmail) {
 
-        String queryString = "UPDATE users SET email = ?, first_name = ?, last_name = ? WHERE email = ?";
+        try {
+            String queryString = "UPDATE users SET email = ?, first_name = ?, last_name = ? WHERE email = ?";
 
-        PreparedStatement statement = this.connection.prepareStatement(queryString);
-        statement.setString(1, newEmail);
-        statement.setString(2, name);
-        statement.setString(3, surname);
-        statement.setString(4, email);
+            PreparedStatement statement = this.connection.prepareStatement(queryString);
+            statement.setString(1, newEmail);
+            statement.setString(2, name);
+            statement.setString(3, surname);
+            statement.setString(4, email);
 
-        statement.execute();
-
+            statement.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex);
+        }
     }
 
 
 
     public void deleteUser(String email) throws Exception {
 
-        String queryString = String.format("DELETE FROM users WHERE email = \"%s\"", email);
-        Statement statement = this.connection.createStatement();
-        statement.execute(queryString);
-        statement.execute("commit;");
+        try {
+
+            String queryString = String.format("DELETE FROM users WHERE email = \"%s\"", email);
+            Statement statement = this.connection.createStatement();
+            statement.execute(queryString);
+            statement.execute("commit;");
+
+        } catch (SQLException ex) {
+            System.out.println(ex);
+        }
     }
 
 
 
-    public void close() throws Exception {
-        this.connection.close();
+    public void close() {
+        try {
+            this.connection.close();
+        } catch (Exception ex) {
+            System.out.println("Closing connection exception");
+            System.out.println(ex);
+        }
     }
 
 }
