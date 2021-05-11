@@ -38,7 +38,7 @@ public class UserDAO {
             );
         } catch (Exception e) {
             System.out.println("Can't connect to the database");
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
     }
 
@@ -59,7 +59,7 @@ public class UserDAO {
             passwordsEqual = hashedPassword.equals(hashedFromDB);
         } catch (Exception e) {
             System.out.println("An error occured while comparing passwords");
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
         return passwordsEqual;
     }
@@ -77,7 +77,7 @@ public class UserDAO {
             exists = rs.next();
         } catch (Exception e) {
             System.out.println("An error getting user from the database");
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
 
         return exists;
@@ -105,7 +105,7 @@ public class UserDAO {
             }
         } catch (Exception e) {
             System.out.println("An error getting user info from database");
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
 
 
@@ -128,7 +128,7 @@ public class UserDAO {
             }
         } catch (Exception e) {
             System.out.println("Error counting users");
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
 
         return max;
@@ -150,7 +150,7 @@ public class UserDAO {
             }
         } catch (Exception e) {
             System.out.println("An error getting salt from the user");
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
 
         return salt;
@@ -172,7 +172,7 @@ public class UserDAO {
             }
         } catch (Exception e) {
             System.out.println("Error getting the name of the user");
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
         return username;
     }
@@ -194,7 +194,7 @@ public class UserDAO {
             }
         } catch (Exception e) {
             System.out.println("Error getting user's last name");
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
         return lastName;
     }
@@ -218,15 +218,15 @@ public class UserDAO {
             hash = factory.generateSecret(spec).getEncoded();
         } catch (DecoderException decExc) {
             System.out.println("Error decoding salt");
-            System.out.println(decExc);
+            System.out.println(decExc.getMessage());
         } catch (NoSuchAlgorithmException noAlgoExc) {
             System.out.println("Error finding hashing algorithm");
-            System.out.println(noAlgoExc);
+            System.out.println(noAlgoExc.getMessage());
         } catch (InvalidKeySpecException invalidKeyExc) {
             System.out.println("Error finding key");
-            System.out.println(invalidKeyExc);
+            System.out.println(invalidKeyExc.getMessage());
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
         strHash = Hex.encodeHexString(hash);
         strSalt = Hex.encodeHexString(byteSalt);
@@ -268,7 +268,7 @@ public class UserDAO {
             statement.executeQuery("commit;");
         } catch (SQLException ex) {
             System.out.println("An exception while inserting user occured");
-            System.out.println(ex);
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -288,7 +288,7 @@ public class UserDAO {
                 hash = rs.getString("password_hash");
             }
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
         return hash;
     }
@@ -305,7 +305,7 @@ public class UserDAO {
 
             statement.execute();
         } catch (SQLException ex) {
-            System.out.println(ex);
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -322,13 +322,13 @@ public class UserDAO {
 
             statement.execute();
         } catch (SQLException ex) {
-            System.out.println(ex);
+            System.out.println(ex.getMessage());
         }
     }
 
 
 
-    public void deleteUser(String email) throws Exception {
+    public void deleteUser(String email) {
 
         try {
 
@@ -338,7 +338,7 @@ public class UserDAO {
             statement.execute("commit;");
 
         } catch (SQLException ex) {
-            System.out.println(ex);
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -349,7 +349,7 @@ public class UserDAO {
             this.connection.close();
         } catch (Exception ex) {
             System.out.println("Closing connection exception");
-            System.out.println(ex);
+            System.out.println(ex.getMessage());
         }
     }
 
