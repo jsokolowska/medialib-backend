@@ -28,7 +28,7 @@ class SwiftMediaFileDAOSpec extends Specification {
                 "test-video.mp4"]
     }
 
-    def listAllSetup(String [] filenames){
+    def uploadAllFiles(String [] filenames){
         for (int i=0; i<filenames.size(); i++){
             def medium = new MediaFile(username, filenames[i], filenames[i])
             def file = new File(resDir + filenames[i])
@@ -39,7 +39,7 @@ class SwiftMediaFileDAOSpec extends Specification {
     def "Should list all objects in the directory" (){
         given: "some sample files"
         String [] names= ["test-gif.gif", "test-img1.jpg", "test-img2.jpeg"]
-        listAllSetup(names)
+        uploadAllFiles(names)
         def files_listed
 
         when: "all files by this user are queried"
@@ -50,6 +50,9 @@ class SwiftMediaFileDAOSpec extends Specification {
         assert files_listed.find {it -> it.getFileId() == names[0]}
         assert files_listed.find {it -> it.getFileId() == names[1]}
         assert files_listed.find {it -> it.getFileId() == names[2]}
+        files_listed.each {
+            print(it.toString());
+        }
     }
 
     def "Should allow for display name to change"(){
@@ -85,6 +88,26 @@ class SwiftMediaFileDAOSpec extends Specification {
         expect:
         swiftDAO.getMediaFileByDisplayName(username, displayNames[0]).getFileId() == names[0]
         swiftDAO.getMediaFileByDisplayName(username, displayNames[1]).getFileId() == names[1]
+
+    }
+
+    def "Should list all images in container"(){
+        given:
+        String [] names= ["test-gif.gif", "test-img1.jpg", "test-img2.jpeg","test-img3.png", "test-video.mp4"]
+        uploadAllFiles(names)
+
+        when:
+        def list = swiftDAO.getAllUserImages(username)
+
+        then:
+        list.size() == 4
+        list.find {it -> it.getFileId() == names[0]}
+        list.find {it -> it.getFileId() == names[1]}
+        list.find {it -> it.getFileId() == names[2]}
+
+        cleanup:
+        cleanup()
+
 
     }
 

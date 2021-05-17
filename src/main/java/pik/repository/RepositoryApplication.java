@@ -1,5 +1,7 @@
 package pik.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ public class RepositoryApplication {
     private static final LoginUsers loginUsers = new LoginUsers();
     private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
     private static final UserDAO userDAO = new UserDAO();
+    private static final ObjectMapper objMapper = new ObjectMapper();
 
     private static final String HEADER_TOKEN = "X-API-TOKEN";
 
@@ -56,28 +59,26 @@ public class RepositoryApplication {
     }
 
     @CrossOrigin
-    //@RequestMapping(value = "/api/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping(value = "/api/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getAllImages(@PathVariable String userId ){      //, @RequestHeader(HEADER_TOKEN) String token){
-        if(!userId.equals("error") ){    //when tokens work: loginUsers.checkUser(userId, token)
-            List<MediaFile> all = mediaFileDAO.getAllUserFiles(userId);
-            if(all == null) return ResponseEntity.ok("{ \"files\": []}");
-            if(all.size() == 0) return ResponseEntity.ok("{ \"files\": []}");
-            StringBuilder response = new StringBuilder("{ \"files\": [");
+    @GetMapping(value = "/api/{email}/image/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getAllImages(@PathVariable String email, @RequestHeader(HEADER_TOKEN) String token){
 
-            for (int i =0; i<all.size()-1; i++){
-                response.append(all.get(i).toJson());
-                System.out.println(all.get(i).toJson());
-                System.out.println("Display name: " + all.get(0).getDisplayName());
-                response.append(",");
+        if(loginUsers.checkUser(email, token) ){
+            List<MediaFile> all = mediaFileDAO.getAllUserImages(email);
+
+            if(all == null) return ResponseEntity.ok("[]");
+            if(all.size() == 0) return ResponseEntity.ok("[]");
+
+            String json;
+            try{
+                json = objMapper.writeValueAsString(all);
+            }catch(JsonProcessingException ex){
+                return ResponseEntity.status(500).body("parsing error");
             }
-            response.append(all.get(all.size()-1).toJson());
-            response.append("]}");
 
-            return ResponseEntity.ok(response.toString());
+            return ResponseEntity.ok(json);
 
         }
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(401).body("unauthorized");
     }
 }
 

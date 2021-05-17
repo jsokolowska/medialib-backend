@@ -2,6 +2,8 @@ package pik.repository.openstack;
 
 import org.javaswift.joss.model.StoredObject;
 
+import java.util.Collection;
+
 public class MediaFile {
     private String userId;
     private String type;
@@ -75,19 +77,24 @@ public class MediaFile {
         this.url = url;
     }
 
-    @Override
-    public String toString (){
-        return "User:" + userId + "\n\tfileID:" + fileId + " displayName:" + displayName + " size:" + size +
-                " type:" + type + "\n\turl:" + url;
-    }
-
-    public String toJson (){
-        return "{" +
-                "\"type\": \"" + type + "\"," +
-                "\"fileId\": \"" + fileId + "\"," +
-                "\"url\": \"" + url + "\"," +
-                "\"displayName\": \"" + displayName + "\"," +
-                "\"size\": \"" + size + "\"}";
-    }
+//    @Override
+//    public String toString (){
+//        return "User:" + userId + "\n\tfileID:" + fileId + " displayName:" + displayName + " size:" + size +
+//                " type:" + type + "\n\turl:" + url;
+//    }
+//
+//    public String toJson (){
+//        return "{" +
+//                "\"type\": \"" + type + "\"," +
+//                "\"fileId\": \"" + fileId + "\"," +
+//                "\"url\": \"" + url + "\"," +
+//                "\"displayName\": \"" + displayName + "\"," +
+//                "\"size\": \"" + size + "\"}";
+//    }
+//
+//    //todo
+//    public static String toJson(Collection<MediaFile> mediaList){
+//        return null;
+//    }
 
 }

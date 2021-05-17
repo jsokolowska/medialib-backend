@@ -7,6 +7,7 @@ import org.javaswift.joss.model.Account;
 import org.javaswift.joss.model.Container;
 import org.javaswift.joss.model.StoredObject;
 
+import javax.print.attribute.standard.Media;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,7 +103,7 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
 
     /** Deletes entry form database if such entry exists */
     @Override
-    public void deleteMediaFile( MediaFile file) {
+    public void deleteMediaFile(MediaFile file) {
         Container container = account.getContainer(file.getUserId());
         if(container.exists()){
             StoredObject object = container.getObject(file.getFileId());
@@ -133,6 +134,20 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         String fileId = obj.getName();
 
         return new MediaFile(userId, fileId, type, displayName, url, size);
+    }
+
+    @Override
+    public List<MediaFile> getAllUserImages(String userId){
+        List<MediaFile> mediaFiles = new ArrayList<>();
+        Container container = account.getContainer(userId);
+        if(!container.exists()) return null;
+        for(StoredObject o : container.list()){
+            if(o.getContentType().startsWith("image")){
+                MediaFile media = storedObjectToMediaFile(o, userId);
+                mediaFiles.add(media);
+            }
+        }
+        return mediaFiles;
     }
 
 }
