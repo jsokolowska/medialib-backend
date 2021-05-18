@@ -115,6 +115,21 @@ public class RepositoryApplication {
 
         return ResponseEntity.ok(json);
     }
+
+    @CrossOrigin
+    @DeleteMapping("/api/{email}/{fileId}")
+    public ResponseEntity deleteFile (@PathVariable String email, @PathVariable String fileId, @RequestHeader(HEADER_TOKEN) String token){
+        if(loginUsers.checkUser(email, token) ){
+            boolean success = mediaFileDAO.deleteMediaFile(email, fileId);
+            if(success){
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.status(404).body("file not found");
+
+        }
+        return ResponseEntity.status(401).body("unauthorized");
+    }
+
 }
 
 

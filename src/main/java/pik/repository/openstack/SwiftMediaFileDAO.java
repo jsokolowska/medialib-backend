@@ -65,6 +65,21 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         }
     }
 
+    @Override
+    /** Deletes entry form database if such entry exists
+     * @return true if file was deleted, false otherwise*/
+    public boolean deleteMediaFile(String userId, String fileId){
+        Container container = account.getContainer(userId);
+        if(container.exists()){
+            StoredObject object = container.getObject(fileId);
+            if (object.exists()){
+                object.delete();
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Creates new entry in Swift database */
     @Override
     public void uploadMediaFile(MediaFile file, File resource){
