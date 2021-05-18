@@ -3,7 +3,6 @@ package pik.repository.openstack
 
 import spock.lang.Specification
 
-import javax.print.attribute.standard.Media
 
 class SwiftMediaFileDAOSpec extends Specification {
     def swiftDAO = new SwiftMediaFileDAO()
@@ -53,7 +52,7 @@ class SwiftMediaFileDAOSpec extends Specification {
         assert files_listed.find {it -> it.getFileId() == names[1]}
         assert files_listed.find {it -> it.getFileId() == names[2]}
         files_listed.each {
-            print(it.toString());
+            print(it.toString())
         }
     }
 
@@ -129,10 +128,27 @@ class SwiftMediaFileDAOSpec extends Specification {
         cleanup()
     }
 
+    def "Should delete files"(){
+        given:
+        String [] names= ["test-img1.jpg", "test-img2.jpeg"]
+        uploadAllFiles(names)
+
+        when:
+        swiftDAO.deleteMediaFile(username, names[1])
+        def list = swiftDAO.getAllByUserAndType(username, "any")
+
+        then:
+        list.size() == 1
+        list[0].getFileId() == names[0]
+
+        cleanup:
+        cleanup()
+    }
+
     def cleanup(){
         def files_listed = swiftDAO.getAllByUser(username)
         for (int i=0; i< files_listed.size(); i++){
-            swiftDAO.deleteMediaFile(files_listed[i])
+            swiftDAO.deleteMediaFile(username, files_listed[i].getFileId())
         }
     }
 }
