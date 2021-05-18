@@ -6,6 +6,7 @@ import org.javaswift.joss.client.factory.AuthenticationMethod;
 import org.javaswift.joss.model.Account;
 import org.javaswift.joss.model.Container;
 import org.javaswift.joss.model.StoredObject;
+import pik.repository.MetadataChange;
 
 import javax.print.attribute.standard.Media;
 import java.io.File;
@@ -55,14 +56,19 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         return null;
     }
 
-    /** Changes display name property. If specified file does not exits this function does nothing*/
+    /** Changes display name property.
+     * @return  true if file exists, false if it doesnt*/
     @Override
-    public void updateMediaFile(MediaFile file) {
-        Container container = account.getContainer(file.getUserId());
+    public boolean updateMediaFile(String username, String fileId, MetadataChange changes){
+        Container container = account.getContainer(username);
         if(container.exists()){
-            StoredObject object = container.getObject(file.getFileId());
-            object.setAndSaveMetadata(DISPLAY_NAME, file.getDisplayName());
+            StoredObject object = container.getObject(fileId);
+            if(object.exists()){
+                object.setAndSaveMetadata(DISPLAY_NAME, changes.getDisplayName());
+                return true;
+            }
         }
+        return false;
     }
 
     @Override

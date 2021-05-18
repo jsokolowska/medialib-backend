@@ -1,5 +1,7 @@
 package pik.repository.openstack;
 
+import pik.repository.MetadataChange;
+
 import java.io.File;
 import java.util.List;
 
@@ -11,7 +13,7 @@ public interface MediaFileDAO {
     List<MediaFile> getAllByUser (String userId);
 
     void uploadMediaFile(MediaFile file, File resource);
-    void updateMediaFile(MediaFile file);
+    boolean updateMediaFile(String username, String fileId, MetadataChange changes);
     boolean deleteMediaFile(String username, String fileId);
 
 }

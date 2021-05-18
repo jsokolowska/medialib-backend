@@ -77,16 +77,6 @@ public class RepositoryApplication {
         return ResponseEntity.status(401).body("unauthorized");
     }
 
-
-//    private ResponseEntity getAll(String email, String type){
-//        List<MediaFile> all = mediaFileDAO.getAllByUserAndType(email, type);
-//
-//        if(all == null) return ResponseEntity.ok("[]");
-//        if(all.size() == 0) return ResponseEntity.ok("[]");
-//
-//        return parseOrError(all);
-//    }
-
     @CrossOrigin
     @GetMapping(value = "/api/{email}/{fileId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getOneById(@PathVariable String email, @PathVariable String fileId, @RequestHeader(HEADER_TOKEN) String token){
@@ -137,6 +127,22 @@ public class RepositoryApplication {
 
         }
         return ResponseEntity.status(401).body("unauthorized");
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/{email}/{fileId}")
+    public ResponseEntity updateMetadata (@PathVariable String email, @PathVariable String fileId,
+                                          @RequestHeader(HEADER_TOKEN) String token,@RequestBody @Valid MetadataChange data){
+        if(loginUsers.checkUser(email, token)){
+            boolean success = mediaFileDAO.updateMediaFile(email, fileId, data);
+            if(success){
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.status(404).body("file not found");
+
+        }
+        return ResponseEntity.status(401).body("unauthorized");
+
     }
 
 }
