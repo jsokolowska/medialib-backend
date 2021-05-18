@@ -131,7 +131,8 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
     }
 
     private MediaFile storedObjectToMediaFile (StoredObject obj, String userId){
-        String displayName = (String) obj.getMetadata(DISPLAY_NAME);
+        Object o = obj.getMetadata(DISPLAY_NAME);
+        String displayName = (String) o;
         String type = obj.getContentType();
         long size = obj.getContentLength();
         String url = obj.getPublicURL();

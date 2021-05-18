@@ -6,6 +6,8 @@ public class MetadataChange {
     @NotEmpty
     private String displayName;
 
+    private String description;
+
     public String getDisplayName() {
         return displayName;
     }
@@ -14,7 +16,20 @@ public class MetadataChange {
         this.displayName = displayName;
     }
 
-    public MetadataChange(String newDisplayName) {
-        this.displayName = newDisplayName;
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public MetadataChange(String displayName, String description) {
+        this.displayName = displayName;
+        this.description = description;
+    }
+    public MetadataChange(String displayName) {
+        this.displayName = displayName;
+        this.description = "";
     }
 }
