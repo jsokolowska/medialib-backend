@@ -59,24 +59,33 @@ public class RepositoryApplication {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/api/{email}/image/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getAllImages(@PathVariable String email, @RequestHeader(HEADER_TOKEN) String token){
-
+    @GetMapping(value = "api/{email}/all", produces=MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getAll(@PathVariable String email, @RequestParam("type") String type, @RequestHeader(HEADER_TOKEN) String token){
+        if(!type.equals("any") && !type.equals("image") && !type.equals("video")){
+            System.out.print ("Type: " + type  + type.getClass());
+            return ResponseEntity.status(400).body("Wrong type");
+        }
         if(loginUsers.checkUser(email, token) ){
-            return getAll(email, "image");
+            List<MediaFile> all = mediaFileDAO.getAllByUserAndType(email, type);
+
+            if(all == null) return ResponseEntity.ok("[]");
+            if(all.size() == 0) return ResponseEntity.ok("[]");
+
+            return parseOrError(all);
 
         }
         return ResponseEntity.status(401).body("unauthorized");
     }
 
-    private ResponseEntity getAll(String email, String type){
-        List<MediaFile> all = mediaFileDAO.getAllByUserAndType(email, type);
 
-        if(all == null) return ResponseEntity.ok("[]");
-        if(all.size() == 0) return ResponseEntity.ok("[]");
-
-        return parseOrError(all);
-    }
+//    private ResponseEntity getAll(String email, String type){
+//        List<MediaFile> all = mediaFileDAO.getAllByUserAndType(email, type);
+//
+//        if(all == null) return ResponseEntity.ok("[]");
+//        if(all.size() == 0) return ResponseEntity.ok("[]");
+//
+//        return parseOrError(all);
+//    }
 
     @CrossOrigin
     @GetMapping(value = "/api/{email}/{fileId}", produces = MediaType.APPLICATION_JSON_VALUE)
