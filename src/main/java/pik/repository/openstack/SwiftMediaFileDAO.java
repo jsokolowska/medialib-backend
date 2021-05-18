@@ -27,19 +27,6 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         account = new AccountFactory(config).createAccount();
     }
 
-    /** @return all user files or null if no files exist*/
-    @Override
-    public List<MediaFile> getAllUserFiles(String userId) {
-        Container container = account.getContainer(userId);
-        if(!container.exists()) return null;
-
-        List<MediaFile> files = new ArrayList<>();
-        for(StoredObject obj : container.list()){
-            files.add( storedObjectToMediaFile(obj, userId));
-        }
-        return files;
-    }
-
     /** This method does not create entry in the database.
      * To create entry use uploadMediaFile function.
      * @return file or null if does not exist */
@@ -51,29 +38,6 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         StoredObject object = container.getObject(fileId);
         if (!object.exists()) return null;
         return storedObjectToMediaFile(object, userId);
-    }
-    public void makeSomeFiles (){
-        Container container = account.getContainer("mock-user");
-        if(!container.exists()){
-            container.create();
-            container.makePublic();}
-
-            MediaFile file =  new MediaFile("mock-user", "mock1","mock1id.gif");
-            uploadMediaFile(file, new File("src/test/resources/objects/test-gif.gif"));
-
-
-            file =  new MediaFile("mock-user", "mock2","mock2id.jpg");
-            uploadMediaFile(file, new File("src/test/resources/objects/test-img1.jpg"));
-
-           file =  new MediaFile("mock-user", "mock3","mock3id.jpeg");
-            uploadMediaFile(file, new File("src/test/resources/objects/test-img2.jpeg"));
-
-            file =  new MediaFile("mock-user", "mock4","mock4id.png");
-            uploadMediaFile(file, new File("src/test/resources/objects/test-img3.png"));
-
-            file =  new MediaFile("mock-user", "mock5","mock5id.mp4");
-            uploadMediaFile(file, new File("src/test/resources/objects/test-video.mp4"));
-
     }
 
     /** @return first file with specified displayName or null if such file does not exist*/
@@ -126,6 +90,37 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         object.setAndSaveMetadata(DISPLAY_NAME, file.getDisplayName());
     }
 
+    @Override
+    public List<MediaFile> getAllByUserAndType (String userId, String type){
+        List<MediaFile> mediaFiles = new ArrayList<>();
+
+        Container container = account.getContainer(userId);
+        if(!container.exists()) return null;
+
+        if(type.equals("image") || type.equals("video")){
+            for(StoredObject object : container.list()){
+                if(object.getContentType().startsWith(type)){
+                    MediaFile media = storedObjectToMediaFile(object, userId);
+                    mediaFiles.add(media);
+                }
+            }
+            return mediaFiles;
+
+        }else if(type.equals("any")){
+            for(StoredObject object : container.list()){
+                MediaFile media = storedObjectToMediaFile(object, userId);
+                mediaFiles.add(media);
+            }
+            return mediaFiles;
+        }
+        return null;
+    }
+
+    @Override
+    public List<MediaFile> getAllByUser (String userId){
+        return getAllByUserAndType(userId, "any");
+    }
+
     private MediaFile storedObjectToMediaFile (StoredObject obj, String userId){
         String displayName = (String) obj.getMetadata(DISPLAY_NAME);
         String type = obj.getContentType();
@@ -134,20 +129,6 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         String fileId = obj.getName();
 
         return new MediaFile(userId, fileId, type, displayName, url, size);
-    }
-
-    @Override
-    public List<MediaFile> getAllUserImages(String userId){
-        List<MediaFile> mediaFiles = new ArrayList<>();
-        Container container = account.getContainer(userId);
-        if(!container.exists()) return null;
-        for(StoredObject o : container.list()){
-            if(o.getContentType().startsWith("image")){
-                MediaFile media = storedObjectToMediaFile(o, userId);
-                mediaFiles.add(media);
-            }
-        }
-        return mediaFiles;
     }
 
 }

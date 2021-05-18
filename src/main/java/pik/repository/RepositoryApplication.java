@@ -63,22 +63,27 @@ public class RepositoryApplication {
     public ResponseEntity getAllImages(@PathVariable String email, @RequestHeader(HEADER_TOKEN) String token){
 
         if(loginUsers.checkUser(email, token) ){
-            List<MediaFile> all = mediaFileDAO.getAllUserImages(email);
-
-            if(all == null) return ResponseEntity.ok("[]");
-            if(all.size() == 0) return ResponseEntity.ok("[]");
-
-            String json;
-            try{
-                json = objMapper.writeValueAsString(all);
-            }catch(JsonProcessingException ex){
-                return ResponseEntity.status(500).body("parsing error");
-            }
-
-            return ResponseEntity.ok(json);
+            return getAll(email, "image");
 
         }
         return ResponseEntity.status(401).body("unauthorized");
+    }
+
+    private ResponseEntity getAll(String email, String type){
+        List<MediaFile> all = mediaFileDAO.getAllByUserAndType(email, type);
+
+        if(all == null) return ResponseEntity.ok("[]");
+        if(all.size() == 0) return ResponseEntity.ok("[]");
+
+        String json;
+        try{
+            json = objMapper.writeValueAsString(all);
+
+        }catch(JsonProcessingException ex){
+            return ResponseEntity.status(500).body("parsing error");
+        }
+
+        return ResponseEntity.ok(json);
     }
 }
 

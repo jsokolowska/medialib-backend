@@ -3,6 +3,8 @@ package pik.repository.openstack
 
 import spock.lang.Specification
 
+import javax.print.attribute.standard.Media
+
 class SwiftMediaFileDAOSpec extends Specification {
     def swiftDAO = new SwiftMediaFileDAO()
     def username = "testuser"
@@ -36,14 +38,14 @@ class SwiftMediaFileDAOSpec extends Specification {
         }
     }
 
-    def "Should list all objects in the directory" (){
+    def "Should list all objects in the container" (){
         given: "some sample files"
         String [] names= ["test-gif.gif", "test-img1.jpg", "test-img2.jpeg"]
         uploadAllFiles(names)
         def files_listed
 
         when: "all files by this user are queried"
-        files_listed = swiftDAO.getAllUserFiles(username)
+        files_listed = swiftDAO.getAllByUser(username)
 
         then: "list should contain files with matching file ids"
         files_listed.size() == 3
@@ -91,32 +93,46 @@ class SwiftMediaFileDAOSpec extends Specification {
 
     }
 
+
     def "Should list all images in container"(){
         given:
         String [] names= ["test-gif.gif", "test-img1.jpg", "test-img2.jpeg","test-img3.png", "test-video.mp4"]
         uploadAllFiles(names)
 
         when:
-        def list = swiftDAO.getAllUserImages(username)
+        def list = swiftDAO.getAllByUserAndType(username, "image")
 
         then:
         list.size() == 4
         list.find {it -> it.getFileId() == names[0]}
         list.find {it -> it.getFileId() == names[1]}
         list.find {it -> it.getFileId() == names[2]}
+        list.find {it -> it.getFileId() == names[3]}
 
         cleanup:
         cleanup()
+    }
 
+    def "Should list all videos in container"(){
+        given:
+        String [] names= ["test-gif.gif", "test-img1.jpg", "test-img2.jpeg","test-img3.png", "test-video.mp4"]
+        uploadAllFiles(names)
 
+        when:
+        def list = swiftDAO.getAllByUserAndType(username, "video")
+
+        then:
+        list.size() == 1
+        list.find {it -> it.getFileId() == names[4]}
+
+        cleanup:
+        cleanup()
     }
 
     def cleanup(){
-        def files_listed = swiftDAO.getAllUserFiles(username)
+        def files_listed = swiftDAO.getAllByUser(username)
         for (int i=0; i< files_listed.size(); i++){
             swiftDAO.deleteMediaFile(files_listed[i])
         }
     }
-
-
 }
