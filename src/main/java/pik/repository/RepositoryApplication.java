@@ -75,9 +75,39 @@ public class RepositoryApplication {
         if(all == null) return ResponseEntity.ok("[]");
         if(all.size() == 0) return ResponseEntity.ok("[]");
 
+        return parseOrError(all);
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/api/{email}/{fileId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getOneById(@PathVariable String email, @PathVariable String fileId, @RequestHeader(HEADER_TOKEN) String token){
+
+        if(loginUsers.checkUser(email, token) ){
+            return getOne(email, fileId, null);
+
+        }
+        return ResponseEntity.status(401).body("unauthorized");
+    }
+
+    private ResponseEntity getOne(String email, String fileId, String displayName){
+        MediaFile result;
+        if(fileId!=null){
+            result = mediaFileDAO.getMediaFile(email, fileId);
+        }else if(displayName != null){
+            result = mediaFileDAO.getMediaFileByDisplayName(email, displayName);
+        }else{
+            return ResponseEntity.status(400).body("File id or display name must be provided");
+        }
+        if(result == null){
+            return ResponseEntity.status(404).body("does not exist");
+        }
+        return parseOrError(result);
+    }
+
+    private ResponseEntity parseOrError(Object result){
         String json;
         try{
-            json = objMapper.writeValueAsString(all);
+            json = objMapper.writeValueAsString(result);
 
         }catch(JsonProcessingException ex){
             return ResponseEntity.status(500).body("parsing error");

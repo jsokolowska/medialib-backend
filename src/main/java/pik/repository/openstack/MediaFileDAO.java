@@ -12,6 +12,5 @@ public interface MediaFileDAO {
 
     void uploadMediaFile(MediaFile file, File resource);
     void updateMediaFile(MediaFile file);
-    void deleteMediaFile(MediaFile file);
 
 }
