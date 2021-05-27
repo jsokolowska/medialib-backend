@@ -36,12 +36,6 @@ pipeline{
                 sh "mvn package"
 		    }
 		}
-// 		}stage('Nexus deploy'){
-// 		    steps{
-// 		        withMaven(maven: 'M3', mavenSettingsConfig: 'mvn-setting-xml') {
-//                     sh "mvn jar:jar deploy:deploy"
-//                 }
-// 		    }
 		stage('Docker buld'){
             steps{
                 sh "docker info"
