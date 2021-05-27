@@ -39,7 +39,7 @@ pipeline{
 		stage('Docker buld'){
             steps{
                 sh "docker info"
-                sh "docker build -t medialib/backend:${currentBuild.number}"
+                sh "docker build -t medialib/backend:${currentBuild.number} ."
                 sh "docker tag medialib/backend:${currentBuild.number} medialib/backend:latest"
                 sh "docker images"
             }
