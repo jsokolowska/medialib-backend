@@ -6,7 +6,7 @@ pipeline{
     }
 
 	stages {
-		stage('Build') {
+		stage('Build jar') {
 			steps {
 			   script {
 			            def pom = readMavenPom file: 'pom.xml'
