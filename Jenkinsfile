@@ -46,7 +46,7 @@ pipeline{
 		}
 		stage('Docker deploy'){
 		    steps{
-                sh "docker run --network=host medialib/backend"
+                sh "docker run --network=host -d medialib/backend"
 		    }
 		}
 	}
