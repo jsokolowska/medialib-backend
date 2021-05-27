@@ -8,16 +8,16 @@ pipeline{
 	stages {
 		stage('Build') {
 			steps {
-			script {
-			    def pom = readMavenPom file: 'pom.xml'
-                // replace last number in version with Jenkins build number
-                version = pom.version.replace("0-SNAPSHOT", "${currentBuild.number}")
+			   script {
+			            def pom = readMavenPom file: 'pom.xml'
+                        // replace last number in version with Jenkins build number
+                        version = pom.version.replace("0-SNAPSHOT", "${currentBuild.number}")
 
-            sh "mvn versions:set -DnewVersion=${version}"
-			withMaven(maven: 'M3', mavenSettingsConfig: 'mvn-setting-xml') {
+                        sh "mvn versions:set -DnewVersion=${version}"
+			            withMaven(maven: 'M3', mavenSettingsConfig: 'mvn-setting-xml') {
                           		sh "mvn clean compile"
-                      		}
-			}
+                      	}
+			}    }
 		}
 		stage('Test') {
 			steps {
@@ -50,5 +50,4 @@ pipeline{
 		    }
 		}
 	}
-}
 }
