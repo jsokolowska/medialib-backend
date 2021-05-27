@@ -56,23 +56,23 @@ class SwiftMediaFileDAOSpec extends Specification {
         }
     }
 
-    def "Should allow for display name to change"(){
-        given:
-        def fileId = "test-img1.jpg"
-        def displayName = "displayName"
-        swiftDAO.uploadMediaFile(new MediaFile(username, fileId, fileId), new File(resDir + fileId))
-        def mediaFile = swiftDAO.getMediaFile(username, fileId)
-
-        when:
-        mediaFile.setDisplayName(displayName)
-        swiftDAO.updateMediaFile(username, fileId, new MetadataChange(displayName))
-        def result = swiftDAO.getMediaFile(username, fileId)
-
-        then:
-        result.getDisplayName() == displayName
-        print(result)
-
-    }
+//    def "Should allow for display name to change"(){
+//        given:
+//        def fileId = "test-img1.jpg"
+//        def displayName = "displayName"
+//        swiftDAO.uploadMediaFile(new MediaFile(username, fileId, fileId), new File(resDir + fileId))
+//        def mediaFile = swiftDAO.getMediaFile(username, fileId)
+//
+//        when:
+//        mediaFile.setDisplayName(displayName)
+//        swiftDAO.updateMediaFile(username, fileId, new MetadataChange(displayName))
+//        def result = swiftDAO.getMediaFile(username, fileId)
+//
+//        then:
+//        result.getDisplayName() == displayName
+//        print(result)
+//
+//    }
 
     def displayNameChangeSetup(String [] filenames, String [] displayNames){
         for (int i=0; i<filenames.size(); i++){
@@ -149,21 +149,6 @@ class SwiftMediaFileDAOSpec extends Specification {
         def files_listed = swiftDAO.getAllByUser(username)
         for (int i=0; i< files_listed.size(); i++){
             swiftDAO.deleteMediaFile(username, files_listed[i].getFileId())
-        }
-    }
-
-    def "Check update for another user"(){
-        var files = swiftDAO.getAllByUser("asia@asia.com")
-
-        files.each {
-            swiftDAO.updateMediaFile("asia@asia.com", it.getFileId(), new MetadataChange("sampleName"))
-        }
-        when:
-        files = swiftDAO.getAllByUser("asia@asia.com")
-
-        then:
-        files.each {
-            it.getDisplayName() == "sampleName"
         }
     }
 }

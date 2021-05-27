@@ -31,14 +31,9 @@ pipeline{
 				}
 			}
 		}
-		stage('Build'){
-		    steps{
-                sh "mvn package"
-		    }
-		}
-		stage('Docker buld'){
+		stage('Docker build'){
             steps{
-                sh "docker info"
+                sh "mvn package"
                 sh "docker build -t medialib/backend:${currentBuild.number} ."
                 sh "docker tag medialib/backend:${currentBuild.number} medialib/backend:latest"
                 sh "docker images"
@@ -46,8 +41,16 @@ pipeline{
 		}
 		stage('Docker deploy'){
 		    steps{
-                sh "docker run --network=host -d medialib/backend"
+		        sh "docker container stop medialibbackend"
+                sh "docker run --name=medialibbackend --network=host -d medialib/backend"
 		    }
 		}
+		stage('Deploy to nexus'){
+        			steps{
+        			    withMaven(maven: 'M3', mavenSettingsConfig: 'mvn-setting-xml') {
+                             sh "mvn jar:jar deploy:deploy"
+                        }
+        			}
+        }
 	}
 }
