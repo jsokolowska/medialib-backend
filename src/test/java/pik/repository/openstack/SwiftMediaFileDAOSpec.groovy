@@ -1,11 +1,11 @@
 package pik.repository.openstack
 
-
+import pik.repository.MetadataChange
 import spock.lang.Specification
 
 
 class SwiftMediaFileDAOSpec extends Specification {
-    def swiftDAO = new SwiftMediaFileDAO()
+    def swiftDAO = new SwiftMediaFileDAO(true)
     def username = "testuser"
     def resDir = "src/test/resources/objects/"
 
@@ -65,10 +65,12 @@ class SwiftMediaFileDAOSpec extends Specification {
 
         when:
         mediaFile.setDisplayName(displayName)
-        swiftDAO.updateMediaFile(mediaFile)
+        swiftDAO.updateMediaFile(username, fileId, new MetadataChange(displayName))
+        def result = swiftDAO.getMediaFile(username, fileId)
 
         then:
-        swiftDAO.getMediaFile(username, fileId).getDisplayName() == displayName
+        result.getDisplayName() == displayName
+        print(result)
 
     }
 
@@ -89,9 +91,7 @@ class SwiftMediaFileDAOSpec extends Specification {
         expect:
         swiftDAO.getMediaFileByDisplayName(username, displayNames[0]).getFileId() == names[0]
         swiftDAO.getMediaFileByDisplayName(username, displayNames[1]).getFileId() == names[1]
-
     }
-
 
     def "Should list all images in container"(){
         given:
@@ -149,6 +149,21 @@ class SwiftMediaFileDAOSpec extends Specification {
         def files_listed = swiftDAO.getAllByUser(username)
         for (int i=0; i< files_listed.size(); i++){
             swiftDAO.deleteMediaFile(username, files_listed[i].getFileId())
+        }
+    }
+
+    def "Check update for another user"(){
+        var files = swiftDAO.getAllByUser("asia@asia.com")
+
+        files.each {
+            swiftDAO.updateMediaFile("asia@asia.com", it.getFileId(), new MetadataChange("sampleName"))
+        }
+        when:
+        files = swiftDAO.getAllByUser("asia@asia.com")
+
+        then:
+        files.each {
+            it.getDisplayName() == "sampleName"
         }
     }
 }

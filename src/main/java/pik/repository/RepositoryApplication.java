@@ -145,6 +145,26 @@ public class RepositoryApplication {
 
     }
 
+    @CrossOrigin
+    @GetMapping(value = "/api/{email}/{fileId}/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity get(@PathVariable String email, @PathVariable String fileId, @RequestHeader(HEADER_TOKEN) String token){
+
+        if(loginUsers.checkUser(email, token) ){
+            MediaFile result;
+            if(fileId!=null){
+                result = mediaFileDAO.getMediaFile(email, fileId);
+            }else{
+                return ResponseEntity.status(400).body("File id or display name must be provided");
+            }
+            if(result == null){
+                return ResponseEntity.status(404).body("does not exist");
+            }
+            return ResponseEntity.ok(result.toJson());
+
+        }
+        return ResponseEntity.status(401).body("unauthorized");
+    }
+
 }
 
 

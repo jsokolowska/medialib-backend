@@ -1,13 +1,9 @@
 package pik.repository.openstack;
 
-import org.javaswift.joss.model.StoredObject;
-
-import java.util.Collection;
-
 public class MediaFile {
     private String userId;
     private String type;
-    private String fileId;
+    private final String fileId;
     private String url;
     private String displayName;
     private final long size;
@@ -51,10 +47,6 @@ public class MediaFile {
         return fileId;
     }
 
-    public void setFileId(String fileId) {
-        this.fileId = fileId;
-    }
-
     public String getDisplayName() {
         return displayName;
     }
@@ -77,4 +69,20 @@ public class MediaFile {
         this.url = url;
     }
 
+    @Override
+    public String toString() {
+        return "MediaFile{" +
+                "userId='" + userId + '\'' +
+                ", type='" + type + '\'' +
+                ", fileId='" + fileId + '\'' +
+                ", url='" + url + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", size=" + size +
+                '}';
+    }
+
+    public String toJson(){
+        return "{ \"displayName\":\"" + displayName  + "\"," +
+                "\"fileId\":\"" + fileId + "\"}";
+    }
 }

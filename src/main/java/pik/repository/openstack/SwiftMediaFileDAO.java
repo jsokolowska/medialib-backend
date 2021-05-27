@@ -1,5 +1,6 @@
 package pik.repository.openstack;
 
+import org.apache.catalina.Store;
 import org.javaswift.joss.client.factory.AccountConfig;
 import org.javaswift.joss.client.factory.AccountFactory;
 import org.javaswift.joss.client.factory.AuthenticationMethod;
@@ -8,24 +9,24 @@ import org.javaswift.joss.model.Container;
 import org.javaswift.joss.model.StoredObject;
 import pik.repository.MetadataChange;
 
-import javax.print.attribute.standard.Media;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class SwiftMediaFileDAO implements MediaFileDAO {
     private final String DISPLAY_NAME = "display-name";
     private final Account account;
 
-    public SwiftMediaFileDAO(){
+    public SwiftMediaFileDAO(boolean mock){
         ResourceBundle bundle = ResourceBundle.getBundle("swift");
         AccountConfig config = new AccountConfig();
         config.setUsername(bundle.getString("user"));
         config.setPassword(bundle.getString("pass"));
         config.setAuthUrl(bundle.getString("authURL"));
         config.setAuthenticationMethod(AuthenticationMethod.BASIC);
-        account = new AccountFactory(config).createAccount();
+        account = new AccountFactory(config).setMock(mock).createAccount();
+    }
+    public SwiftMediaFileDAO(){
+        this(false);
     }
 
     /** This method does not create entry in the database.
