@@ -2,8 +2,13 @@ package pik.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +20,10 @@ import pik.repository.openstack.MediaFile;
 import pik.repository.openstack.MediaFileDAO;
 import pik.repository.openstack.SwiftMediaFileDAO;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
@@ -22,15 +31,28 @@ import java.util.List;
 @SpringBootApplication
 public class RepositoryApplication {
 
-    private static final LoginUsers loginUsers = new LoginUsers();
+    @Autowired
+    public LoginUsers loginUsers;
     private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
     private static final UserDAO userDAO = new UserDAO();
     private static final ObjectMapper objMapper = new ObjectMapper();
 
-    private static final String HEADER_TOKEN = "X-API-TOKEN";
+    private static final String HEADER_LOGIN = "LOGIN";
+    private static final String KEY = "pikKey";
 
     public static void main(String[] args) {
         SpringApplication.run(RepositoryApplication.class, args);
+    }
+
+    @Bean
+    public FilterRegistrationBean filterRegistrationBean(){
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+        filterRegistrationBean.setFilter(new JWTFilter(KEY));
+        ArrayList<String> urls = new ArrayList<>();
+        //dodanie adresów url, które są dostępne dopiero po zalogowaniu
+        urls.add("/hello");
+        filterRegistrationBean.setUrlPatterns(urls);
+        return filterRegistrationBean;
     }
 
     @CrossOrigin
@@ -45,7 +67,7 @@ public class RepositoryApplication {
             return ResponseEntity.status(401).body("error password");
         }
         String token = loginUsers.addUser(email);
-        return ResponseEntity.ok("{\"token\":\""+token+"\"}");
+        return ResponseEntity.ok(Jwts.builder().setSubject(email).claim("token", token).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + 1200000)).signWith(SignatureAlgorithm.HS512, KEY).compact());
     }
 
     @CrossOrigin
@@ -57,7 +79,7 @@ public class RepositoryApplication {
         userDAO.insertUser(dane.getName(), dane.getSurname(), dane.getEmail(), dane.getPassword());
         return ResponseEntity.ok("");
     }
-
+/*
     @CrossOrigin
     @GetMapping(value = "api/{email}/all", produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAll(@PathVariable String email, @RequestParam("type") String type, @RequestHeader(HEADER_TOKEN) String token){
@@ -138,7 +160,7 @@ public class RepositoryApplication {
         }
         return ResponseEntity.status(401).body("unauthorized");
     }
-
+*/
 }
 
 

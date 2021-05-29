@@ -1,8 +1,11 @@
 package pik.repository;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Map;
 import java.util.TreeMap;
 
+@Component
 public class LoginUsers {
     private final Map<String, String> loginUser = new TreeMap<>();
     public String getToken(String email){
