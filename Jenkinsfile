@@ -41,8 +41,8 @@ pipeline{
 		}
 		stage('Docker deploy'){
 		    steps{
-		        sh "docker container stop medialibbackend"
-		        sh "docker container rm medialibbackend"
+		        //sh "docker container stop medialibbackend"
+		        //sh "docker container rm medialibbackend"
                 sh "docker run --name=medialibbackend --network=host -d medialib/backend"
 		    }
 		}
