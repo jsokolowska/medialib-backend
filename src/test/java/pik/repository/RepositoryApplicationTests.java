@@ -23,11 +23,11 @@ class RepositoryApplicationTests {
 
     @Test
     void contextLoads() throws Exception {
-        this.mocMvc.perform(post("/api/login")
+        /*this.mocMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\":\"ala\",\"password\":\"12345\"}"))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk());*/
 
         this.mocMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -36,11 +36,11 @@ class RepositoryApplicationTests {
                 .andExpect(status().is(400));
 
 
-        this.mocMvc.perform(post("/api/signup")
+        /*this.mocMvc.perform(post("/api/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\":\"ala\",\"password\":\"12345\",\"name\":\"alicja\", \"surname\":\"turowska\"}"))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk());*/
 
         this.mocMvc.perform(post("/api/signup")
                 .contentType(MediaType.APPLICATION_JSON)
