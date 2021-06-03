@@ -1,13 +1,22 @@
 package pik.repository.openstack
 
-import pik.repository.MetadataChange
+import pik.repository.util.MediaFile
 import spock.lang.Specification
 
 
 class SwiftMediaFileDAOSpec extends Specification {
-    def swiftDAO = new SwiftMediaFileDAO(true)
+    def swiftDAO = new SwiftMediaFileDAO(false)
     def username = "testuser"
     def resDir = "src/test/resources/objects/"
+
+    def "Sth"(){
+        var rest = swiftDAO.sth()
+        rest.each {
+            print(it)
+        }
+        expect:
+        1 ==1
+    }
 
     def "Should add different types of resources"(){
         given:

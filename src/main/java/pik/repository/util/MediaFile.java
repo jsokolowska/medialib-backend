@@ -1,4 +1,4 @@
-package pik.repository.openstack;
+package pik.repository.util;
 
 public class MediaFile {
     private String userId;

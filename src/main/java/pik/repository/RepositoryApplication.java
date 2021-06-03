@@ -16,13 +16,15 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import org.springframework.http.MediaType;
 import pik.repository.mysqlDAOs.UserDAO;
-import pik.repository.openstack.MediaFile;
+import pik.repository.oauth.JWTFilter;
+import pik.repository.oauth.LoginUsers;
+import pik.repository.util.MediaFile;
 import pik.repository.openstack.MediaFileDAO;
 import pik.repository.openstack.SwiftMediaFileDAO;
+import pik.repository.util.Login;
+import pik.repository.util.MetadataChange;
+import pik.repository.util.UserData;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +35,7 @@ public class RepositoryApplication {
 
     @Autowired
     public LoginUsers loginUsers;
+
     private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
     private static final UserDAO userDAO = new UserDAO();
     private static final ObjectMapper objMapper = new ObjectMapper();
@@ -45,18 +48,19 @@ public class RepositoryApplication {
     }
 
     @Bean
-    public FilterRegistrationBean filterRegistrationBean(){
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
+        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new JWTFilter(KEY));
-        ArrayList<String> urls = new ArrayList<>();
+        //ArrayList<String> urls = new ArrayList<>();
         //dodanie adresów url, które są dostępne dopiero po zalogowaniu
-        urls.add("/hello");
-        filterRegistrationBean.setUrlPatterns(urls);
+        //urls.add("/hello");
+        //filterRegistrationBean.setUrlPatterns(urls);
+        filterRegistrationBean.addUrlPatterns("/api/*");
         return filterRegistrationBean;
     }
 
     @CrossOrigin
-    @RequestMapping(value="/api/login", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value="/oauth/login", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity login(@RequestBody @Valid Login dane){
         String email = dane.getEmail();
         String password = dane.getPassword();
@@ -71,7 +75,7 @@ public class RepositoryApplication {
     }
 
     @CrossOrigin
-    @RequestMapping(value="/api/signup", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value="/oauth/signup", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity register(@RequestBody @Valid UserData dane){
         if(userDAO.isUserExist(dane.getEmail())){
             return ResponseEntity.status(401).body("just exist");
@@ -79,45 +83,24 @@ public class RepositoryApplication {
         userDAO.insertUser(dane.getName(), dane.getSurname(), dane.getEmail(), dane.getPassword());
         return ResponseEntity.ok("");
     }
-/*
     @CrossOrigin
-    @GetMapping(value = "api/{email}/all", produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getAll(@PathVariable String email, @RequestParam("type") String type, @RequestHeader(HEADER_TOKEN) String token){
-        if(!type.equals("any") && !type.equals("image") && !type.equals("video")){
-            System.out.print ("Type: " + type  + type.getClass());
-            return ResponseEntity.status(400).body("Wrong type");
+    @GetMapping(value = "/api/all", produces=MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getAll(@RequestHeader(HEADER_LOGIN) String email, @RequestParam("type") String type){
+        if(!(type.equals("any") || type.equals("video") || type.equals("image"))){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        if(loginUsers.checkUser(email, token) ){
-            List<MediaFile> all = mediaFileDAO.getAllByUserAndType(email, type);
+        List<MediaFile> all = mediaFileDAO.getAllByUserAndType(email, type);
 
-            if(all == null) return ResponseEntity.ok("[]");
-            if(all.size() == 0) return ResponseEntity.ok("[]");
+        if(all == null) return ResponseEntity.ok("[]");
+        if(all.size() == 0) return ResponseEntity.ok("[]");
 
-            return parseOrError(all);
-
-        }
-        return ResponseEntity.status(401).body("unauthorized");
+        return parseOrError(all);
     }
 
-
-//    private ResponseEntity getAll(String email, String type){
-//        List<MediaFile> all = mediaFileDAO.getAllByUserAndType(email, type);
-//
-//        if(all == null) return ResponseEntity.ok("[]");
-//        if(all.size() == 0) return ResponseEntity.ok("[]");
-//
-//        return parseOrError(all);
-//    }
-
     @CrossOrigin
-    @GetMapping(value = "/api/{email}/{fileId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getOneById(@PathVariable String email, @PathVariable String fileId, @RequestHeader(HEADER_TOKEN) String token){
-
-        if(loginUsers.checkUser(email, token) ){
-            return getOne(email, fileId, null);
-
-        }
-        return ResponseEntity.status(401).body("unauthorized");
+    @GetMapping(value = "/api/file/{fileId}/", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getOneById(@RequestHeader(HEADER_LOGIN) String email, @PathVariable String fileId){
+        return getOne(email, fileId, null);
     }
 
     private ResponseEntity getOne(String email, String fileId, String displayName){
@@ -148,23 +131,19 @@ public class RepositoryApplication {
     }
 
     @CrossOrigin
-    @DeleteMapping("/api/{email}/{fileId}")
-    public ResponseEntity deleteFile (@PathVariable String email, @PathVariable String fileId, @RequestHeader(HEADER_TOKEN) String token){
-        if(loginUsers.checkUser(email, token) ){
-            boolean success = mediaFileDAO.deleteMediaFile(email, fileId);
-            if(success){
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.status(404).body("file not found");
-
+    @DeleteMapping("/api/file/{fileId}")
+    public ResponseEntity deleteFile (@RequestHeader(HEADER_LOGIN) String email, @PathVariable String fileId){
+        boolean success = mediaFileDAO.deleteMediaFile(email, fileId);
+        if(success){
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.status(401).body("unauthorized");
+        return ResponseEntity.status(404).body("file not found");
     }
 
     @CrossOrigin
-    @PostMapping("/api/{email}/{fileId}")
-    public ResponseEntity updateMetadata (@PathVariable String email, @PathVariable String fileId,
-                                          @RequestHeader(HEADER_TOKEN) String token,@RequestBody @Valid MetadataChange data){
+    @PostMapping("/api/file/{fileId}")
+    public ResponseEntity updateMetadata (@RequestHeader(HEADER_LOGIN)  String email, @PathVariable String fileId,
+                                          String token,@RequestBody @Valid MetadataChange data){
         if(loginUsers.checkUser(email, token)){
             boolean success = mediaFileDAO.updateMediaFile(email, fileId, data);
             if(success){
@@ -177,25 +156,20 @@ public class RepositoryApplication {
 
     }
 
-    @CrossOrigin
-    @GetMapping(value = "/api/{email}/{fileId}/get", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity get(@PathVariable String email, @PathVariable String fileId, @RequestHeader(HEADER_TOKEN) String token){
-
-        if(loginUsers.checkUser(email, token) ){
-            MediaFile result;
-            if(fileId!=null){
-                result = mediaFileDAO.getMediaFile(email, fileId);
-            }else{
-                return ResponseEntity.status(400).body("File id or display name must be provided");
-            }
-            if(result == null){
-                return ResponseEntity.status(404).body("does not exist");
-            }
-            return ResponseEntity.ok(result.toJson());
-
-        }
-        return ResponseEntity.status(401).body("unauthorized");
-    }*/
+//    @CrossOrigin
+//    @GetMapping(value = "/api/{fileId}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity get(@RequestHeader("LOGIN")  String email, @PathVariable String fileId){
+//        MediaFile result;
+//        if(fileId!=null){
+//            result = mediaFileDAO.getMediaFile(email, fileId);
+//        }else{
+//            return ResponseEntity.status(400).body("File id or display name must be provided");
+//        }
+//        if(result == null){
+//            return ResponseEntity.status(404).body("does not exist");
+//        }
+//        return ResponseEntity.ok(result.toJson());
+//    }
 
 }
 

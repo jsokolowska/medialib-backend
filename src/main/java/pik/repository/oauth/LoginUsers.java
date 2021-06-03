@@ -1,4 +1,4 @@
-package pik.repository;
+package pik.repository.oauth;
 
 import org.springframework.stereotype.Component;
 

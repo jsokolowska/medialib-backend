@@ -1,6 +1,6 @@
 package pik.repository.mysqlDAO
 
-import pik.repository.User
+
 import pik.repository.mysqlDAOs.UserDAO
 import spock.lang.Specification
 

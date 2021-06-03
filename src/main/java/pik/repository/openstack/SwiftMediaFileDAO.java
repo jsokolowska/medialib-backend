@@ -1,13 +1,13 @@
 package pik.repository.openstack;
 
-import org.apache.catalina.Store;
 import org.javaswift.joss.client.factory.AccountConfig;
 import org.javaswift.joss.client.factory.AccountFactory;
 import org.javaswift.joss.client.factory.AuthenticationMethod;
 import org.javaswift.joss.model.Account;
 import org.javaswift.joss.model.Container;
 import org.javaswift.joss.model.StoredObject;
-import pik.repository.MetadataChange;
+import pik.repository.util.MediaFile;
+import pik.repository.util.MetadataChange;
 
 import java.io.File;
 import java.util.*;
@@ -27,6 +27,18 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
     }
     public SwiftMediaFileDAO(){
         this(false);
+    }
+
+    public List<MediaFile> sth(){
+        var result = new ArrayList<MediaFile>();
+        Collection<Container> containers = account.list();
+        for (Container currentContainer : containers) {
+            Collection<StoredObject> lst = currentContainer.list();
+            for(StoredObject obj : lst){
+                result.add(storedObjectToMediaFile(obj, "-"));
+            }
+        }
+        return result;
     }
 
     /** This method does not create entry in the database.

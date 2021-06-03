@@ -1,4 +1,4 @@
-package pik.repository;
+package pik.repository.util;
 
 import javax.validation.constraints.NotEmpty;
 

@@ -1,6 +1,7 @@
 package pik.repository.openstack;
 
-import pik.repository.MetadataChange;
+import pik.repository.util.MediaFile;
+import pik.repository.util.MetadataChange;
 
 import java.io.File;
 import java.util.List;

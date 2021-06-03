@@ -1,10 +1,7 @@
 package pik.repository.mysqlDAOs;
 
-import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -14,10 +11,9 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 
 
-import org.apache.commons.codec.Decoder;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import pik.repository.User;
+import pik.repository.util.User;
 
 
 public class UserDAO {

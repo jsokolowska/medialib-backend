@@ -1,4 +1,4 @@
-package pik.repository;
+package pik.repository.util;
 
 public class User {
     private String token;
