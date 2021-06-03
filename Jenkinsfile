@@ -41,9 +41,8 @@ pipeline{
 		}
 		stage('Docker deploy'){
 		    steps{
-		        sh "docker container stop medialibbackend"
-		        sh "docker container rm medialibbackend"
-                sh "docker run --name=medialibbackend --network=host -d medialib/backend"
+		        sh "docker container stop medialibbackend || true && docker container rm medialibbackend || true"
+                sh "docker run --name=medialibbackend --network=host -d medialib/backend:latest"
 		    }
 		}
 		stage('Deploy to nexus'){
