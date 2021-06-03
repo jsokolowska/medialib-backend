@@ -154,4 +154,21 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         return new MediaFile(userId, fileId, type, displayName, url, size);
     }
 
+    public List<MediaFile> getAllContaining (String userId, String name){
+        List<MediaFile> mediaFiles = new ArrayList<>();
+
+        Container container = account.getContainer(userId);
+        if(!container.exists()) return null;
+
+        for(StoredObject object : container.list()){
+            String displayName = (String) object.getMetadata(DISPLAY_NAME);
+            if(displayName.contains(name)){
+                MediaFile media = storedObjectToMediaFile(object, userId);
+                mediaFiles.add(media);
+            }
+        }
+
+        return mediaFiles;
+    }
+
 }

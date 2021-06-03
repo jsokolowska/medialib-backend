@@ -1,22 +1,14 @@
 package pik.repository.openstack
 
 import pik.repository.util.MediaFile
+import pik.repository.util.MetadataChange
 import spock.lang.Specification
 
 
 class SwiftMediaFileDAOSpec extends Specification {
-    def swiftDAO = new SwiftMediaFileDAO(false)
+    def swiftDAO = new SwiftMediaFileDAO(true)
     def username = "testuser"
     def resDir = "src/test/resources/objects/"
-
-    def "Sth"(){
-        var rest = swiftDAO.sth()
-        rest.each {
-            print(it)
-        }
-        expect:
-        1 ==1
-    }
 
     def "Should add different types of resources"(){
         given:
@@ -65,23 +57,23 @@ class SwiftMediaFileDAOSpec extends Specification {
         }
     }
 
-//    def "Should allow for display name to change"(){
-//        given:
-//        def fileId = "test-img1.jpg"
-//        def displayName = "displayName"
-//        swiftDAO.uploadMediaFile(new MediaFile(username, fileId, fileId), new File(resDir + fileId))
-//        def mediaFile = swiftDAO.getMediaFile(username, fileId)
-//
-//        when:
-//        mediaFile.setDisplayName(displayName)
-//        swiftDAO.updateMediaFile(username, fileId, new MetadataChange(displayName))
-//        def result = swiftDAO.getMediaFile(username, fileId)
-//
-//        then:
-//        result.getDisplayName() == displayName
-//        print(result)
-//
-//    }
+    def "Should allow for display name to change"(){
+        given:
+        def fileId = "test-img1.jpg"
+        def displayName = "displayName"
+        swiftDAO.uploadMediaFile(new MediaFile(username, fileId, fileId), new File(resDir + fileId))
+        def mediaFile = swiftDAO.getMediaFile(username, fileId)
+
+        when:
+        mediaFile.setDisplayName(displayName)
+        swiftDAO.updateMediaFile(username, fileId, new MetadataChange(displayName))
+        def result = swiftDAO.getMediaFile(username, fileId)
+
+        then:
+        result.getDisplayName() == displayName
+        print(result)
+
+    }
 
     def displayNameChangeSetup(String [] filenames, String [] displayNames){
         for (int i=0; i<filenames.size(); i++){
@@ -91,15 +83,14 @@ class SwiftMediaFileDAOSpec extends Specification {
         }
     }
 
-    def "Should allow to find file by its display name"(){
+    def "Should allow to find file by part of its display name"(){
         given:
         String [] names= ["test-gif.gif", "test-img1.jpg", "test-img2.jpeg"]
-        String [] displayNames = ["display1", "display2", "display1"]
+        String [] displayNames = ["how is display1", "display2 is thee", "not"]
         displayNameChangeSetup(names, displayNames)
 
         expect:
-        swiftDAO.getMediaFileByDisplayName(username, displayNames[0]).getFileId() == names[0]
-        swiftDAO.getMediaFileByDisplayName(username, displayNames[1]).getFileId() == names[1]
+        swiftDAO.getAllContaining( username, "display").size() == 2
     }
 
     def "Should list all images in container"(){

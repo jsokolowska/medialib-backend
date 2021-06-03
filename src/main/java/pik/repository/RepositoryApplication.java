@@ -83,6 +83,7 @@ public class RepositoryApplication {
         userDAO.insertUser(dane.getName(), dane.getSurname(), dane.getEmail(), dane.getPassword());
         return ResponseEntity.ok("");
     }
+
     @CrossOrigin
     @GetMapping(value = "/api/all", produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAll(@RequestHeader(HEADER_LOGIN) String email, @RequestParam("type") String type){
@@ -156,20 +157,12 @@ public class RepositoryApplication {
 
     }
 
-//    @CrossOrigin
-//    @GetMapping(value = "/api/{fileId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity get(@RequestHeader("LOGIN")  String email, @PathVariable String fileId){
-//        MediaFile result;
-//        if(fileId!=null){
-//            result = mediaFileDAO.getMediaFile(email, fileId);
-//        }else{
-//            return ResponseEntity.status(400).body("File id or display name must be provided");
-//        }
-//        if(result == null){
-//            return ResponseEntity.status(404).body("does not exist");
-//        }
-//        return ResponseEntity.ok(result.toJson());
-//    }
+    @CrossOrigin
+    @GetMapping(value = "/api/find", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity get(@RequestHeader("LOGIN")  String email, @RequestParam("name") String fileName){
+        List<MediaFile> results = mediaFileDAO.getAllContaining(email, fileName);
+        return parseOrError(results);
+    }
 
 }
 
