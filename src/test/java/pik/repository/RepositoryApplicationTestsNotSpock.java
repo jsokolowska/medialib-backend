@@ -16,20 +16,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class RepositoryApplicationTests {
+class RepositoryApplicationTestsNotSpock {
 
     @Autowired
     private MockMvc mocMvc;
 
     @Test
-    void contextLoads() throws Exception {
+    void contextLoads1() throws Exception {
         /*this.mocMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\":\"ala\",\"password\":\"12345\"}"))
                 .andDo(print())
                 .andExpect(status().isOk());*/
 
-        this.mocMvc.perform(post("/api/login")
+        this.mocMvc.perform(post("/oauth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"password\":\"12345\"}"))
                 .andDo(print())
@@ -42,7 +42,7 @@ class RepositoryApplicationTests {
                 .andDo(print())
                 .andExpect(status().isOk());*/
 
-        this.mocMvc.perform(post("/api/signup")
+        this.mocMvc.perform(post("/oauth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\":\"ala\",\"name\":\"alicja\", \"surname\":\"turowska\"}"))
                 .andDo(print())
