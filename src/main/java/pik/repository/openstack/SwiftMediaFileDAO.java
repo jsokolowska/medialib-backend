@@ -1,30 +1,32 @@
 package pik.repository.openstack;
 
+import org.apache.catalina.Store;
 import org.javaswift.joss.client.factory.AccountConfig;
 import org.javaswift.joss.client.factory.AccountFactory;
 import org.javaswift.joss.client.factory.AuthenticationMethod;
 import org.javaswift.joss.model.Account;
 import org.javaswift.joss.model.Container;
 import org.javaswift.joss.model.StoredObject;
+import pik.repository.MetadataChange;
 
-import javax.print.attribute.standard.Media;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class SwiftMediaFileDAO implements MediaFileDAO {
     private final String DISPLAY_NAME = "display-name";
     private final Account account;
 
-    public SwiftMediaFileDAO(){
+    public SwiftMediaFileDAO(boolean mock){
         ResourceBundle bundle = ResourceBundle.getBundle("swift");
         AccountConfig config = new AccountConfig();
         config.setUsername(bundle.getString("user"));
         config.setPassword(bundle.getString("pass"));
         config.setAuthUrl(bundle.getString("authURL"));
         config.setAuthenticationMethod(AuthenticationMethod.BASIC);
-        account = new AccountFactory(config).createAccount();
+        account = new AccountFactory(config).setMock(mock).createAccount();
+    }
+    public SwiftMediaFileDAO(){
+        this(false);
     }
 
     /** This method does not create entry in the database.
@@ -55,14 +57,19 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         return null;
     }
 
-    /** Changes display name property. If specified file does not exits this function does nothing*/
+    /** Changes display name property.
+     * @return  true if file exists, false if it doesnt*/
     @Override
-    public void updateMediaFile(MediaFile file) {
-        Container container = account.getContainer(file.getUserId());
+    public boolean updateMediaFile(String username, String fileId, MetadataChange changes){
+        Container container = account.getContainer(username);
         if(container.exists()){
-            StoredObject object = container.getObject(file.getFileId());
-            object.setAndSaveMetadata(DISPLAY_NAME, file.getDisplayName());
+            StoredObject object = container.getObject(fileId);
+            if(object.exists()){
+                object.setAndSaveMetadata(DISPLAY_NAME, changes.getDisplayName());
+                return true;
+            }
         }
+        return false;
     }
 
     @Override
@@ -125,7 +132,8 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
     }
 
     private MediaFile storedObjectToMediaFile (StoredObject obj, String userId){
-        String displayName = (String) obj.getMetadata(DISPLAY_NAME);
+        Object o = obj.getMetadata(DISPLAY_NAME);
+        String displayName = (String) o;
         String type = obj.getContentType();
         long size = obj.getContentLength();
         String url = obj.getPublicURL();
