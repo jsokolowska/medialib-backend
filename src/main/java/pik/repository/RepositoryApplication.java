@@ -144,17 +144,12 @@ public class RepositoryApplication {
     @CrossOrigin
     @PostMapping("/api/file/{fileId}")
     public ResponseEntity updateMetadata (@RequestHeader(HEADER_LOGIN)  String email, @PathVariable String fileId,
-                                          String token,@RequestBody @Valid MetadataChange data){
-        if(loginUsers.checkUser(email, token)){
-            boolean success = mediaFileDAO.updateMediaFile(email, fileId, data);
-            if(success){
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.status(404).body("file not found");
-
+                                          @RequestBody @Valid MetadataChange data){
+        boolean success = mediaFileDAO.updateMediaFile(email, fileId, data);
+        if(success){
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.status(401).body("unauthorized");
-
+        return ResponseEntity.status(404).body("file not found");
     }
 
     @CrossOrigin
