@@ -25,15 +25,9 @@ pipeline{
 			}
 		}
 		stage('SonarQube analysis') {
-			environment {
-				scannerHome = tool 'sonar-scanner';
-			}
 			steps {
 				withSonarQubeEnv('sonar-server') {
-					sh '${scannerHome}/bin/sonar-scanner \
-					-D sonar.projectKey=pik:repository \
-					-D sonar.projectName=repository \
-					-D sonar.tests=src/test/groovy'
+					sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar'
 				}
 			}
 		}

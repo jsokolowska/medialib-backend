@@ -37,6 +37,7 @@
     <properties>
         <java.version>11</java.version>
         <groovy.version>3.0.7</groovy.version>
+        <sonar.tests>src/test/groovy</sonar.tests>
     </properties>
 
     <dependencies>
