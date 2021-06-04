@@ -57,7 +57,7 @@ class SwiftMediaFileDAOSpec extends Specification {
         }
     }
 
-    def "Should allow for display name to change"(){
+    /*def "Should allow for display name to change"(){
         given:
         def fileId = "test-img1.jpg"
         def displayName = "displayName"
@@ -73,7 +73,7 @@ class SwiftMediaFileDAOSpec extends Specification {
         result.getDisplayName() == displayName
         print(result)
 
-    }
+    }*/
 
     def displayNameChangeSetup(String [] filenames, String [] displayNames){
         for (int i=0; i<filenames.size(); i++){
