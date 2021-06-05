@@ -38,6 +38,10 @@
         <java.version>11</java.version>
         <groovy.version>3.0.7</groovy.version>
         <sonar.tests>src/test/groovy</sonar.tests>
+        <jacoco.verison>0.8.7</jacoco.verison>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.jacoco.reporthPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reporthPath>
     </properties>
 
     <dependencies>
@@ -169,6 +173,25 @@
                         <include>**/**/*Spec.java</include>
                     </includes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
