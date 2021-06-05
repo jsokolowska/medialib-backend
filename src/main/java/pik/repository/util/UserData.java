@@ -1,9 +1,11 @@
 package pik.repository.util;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
 public class UserData {
 
+    @Email
     @NotEmpty
     private String email;
     @NotEmpty
