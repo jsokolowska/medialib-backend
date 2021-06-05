@@ -21,12 +21,8 @@ pipeline{
 		}
 		stage('Test') {
 			steps {
-				step {
-					sh "mvn test"
-				}
-				step {
-					sh "mvn jacoco:report"
-				}
+				sh "mvn test"
+				sh "mvn jacoco:report"
 			}
 		}
 		stage('SonarQube analysis') {
