@@ -40,8 +40,8 @@ import java.util.ResourceBundle;
 @SpringBootApplication
 public class RepositoryApplication {
 
-    @Autowired
-    public LoginUsers loginUsers;
+//    @Autowired
+//    public LoginUsers loginUsers;
 
     private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
     private static final UserDAO userDAO = new UserDAO();
@@ -49,18 +49,20 @@ public class RepositoryApplication {
 
     private static final String HEADER_LOGIN = "LOGIN";
     private static final String KEY = "pikKey";
+    //delete this
+    private static final String email = "asia@asia.com";
 
     public static void main(String[] args) {
         SpringApplication.run(RepositoryApplication.class, args);
     }
 
-    @Bean
-    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
-        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-        filterRegistrationBean.setFilter(new JWTFilter(KEY));
-        filterRegistrationBean.addUrlPatterns("/api/*");
-        return filterRegistrationBean;
-    }
+//    @Bean
+//    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
+//        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+//        filterRegistrationBean.setFilter(new JWTFilter(KEY));
+//        filterRegistrationBean.addUrlPatterns("/api/*");
+//        return filterRegistrationBean;
+//    }
 
     @CrossOrigin
     @RequestMapping(value="/oauth/login", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
@@ -73,8 +75,9 @@ public class RepositoryApplication {
         if(!userDAO.isPasswordMatch(email, password)){
             return ResponseEntity.status(401).body("error password");
         }
-        String token = loginUsers.addUser(email);
-        return ResponseEntity.ok(Jwts.builder().setSubject(email).claim("token", token).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + 1200000)).signWith(SignatureAlgorithm.HS512, KEY).compact());
+//        String token = loginUsers.addUser(email);
+        return ResponseEntity.ok("zaślepka");
+//        return ResponseEntity.ok(Jwts.builder().setSubject(email).claim("token", token).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + 1200000)).signWith(SignatureAlgorithm.HS512, KEY).compact());
     }
 
     @CrossOrigin
@@ -89,7 +92,7 @@ public class RepositoryApplication {
 
     @CrossOrigin
     @GetMapping(value = "/api/all", produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getAll(@RequestHeader(HEADER_LOGIN) String email, @RequestParam("type") String type){
+    public ResponseEntity getAll(/*@RequestHeader(HEADER_LOGIN) String email*/ @RequestParam("type") String type){
         if(!(type.equals("any") || type.equals("video") || type.equals("image"))){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -102,8 +105,8 @@ public class RepositoryApplication {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/api/file/{fileId}/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getOneById(@RequestHeader(HEADER_LOGIN) String email, @PathVariable String fileId){
+    @GetMapping(value = "/api/file/{fileId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getOneById(/*@RequestHeader(HEADER_LOGIN) String email,*/ @PathVariable String fileId){
         return getOne(email, fileId, null);
     }
 
@@ -136,7 +139,7 @@ public class RepositoryApplication {
 
     @CrossOrigin
     @DeleteMapping("/api/file/{fileId}")
-    public ResponseEntity deleteFile (@RequestHeader(HEADER_LOGIN) String email, @PathVariable String fileId){
+    public ResponseEntity deleteFile (/*@RequestHeader(HEADER_LOGIN) String email,*/ @PathVariable String fileId){
         boolean success = mediaFileDAO.deleteMediaFile(email, fileId);
         if(success){
             return ResponseEntity.ok().build();
@@ -146,7 +149,7 @@ public class RepositoryApplication {
 
     @CrossOrigin
     @PostMapping("/api/file/{fileId}")
-    public ResponseEntity updateMetadata (@RequestHeader(HEADER_LOGIN)  String email, @PathVariable String fileId,
+    public ResponseEntity updateMetadata (/*@RequestHeader(HEADER_LOGIN)  String email*/ @PathVariable String fileId,
                                           @RequestBody @Valid MetadataChange data){
         boolean success = mediaFileDAO.updateMediaFile(email, fileId, data);
         if(success){
@@ -157,14 +160,15 @@ public class RepositoryApplication {
 
     @CrossOrigin
     @GetMapping(value = "/api/find", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity get(@RequestHeader("LOGIN")  String email, @RequestParam("name") String fileName){
+    public ResponseEntity get(/*@RequestHeader("LOGIN")  String email,*/ @RequestParam("name") String fileName){
         List<MediaFile> results = mediaFileDAO.getAllContaining(email, fileName);
         return parseOrError(results);
     }
 
     @CrossOrigin
     @GetMapping(value = "/api/upload", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity uploadObject(@RequestHeader("LOGIN")  String email, @RequestParam("fileId") String fileName){
+    public ResponseEntity uploadObject(/*@RequestHeader("LOGIN")  String email*/ @RequestParam("fileId") String fileName){
+
         if (fileName.contains(" ")){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("FileId cannot contain spaces");
         }
