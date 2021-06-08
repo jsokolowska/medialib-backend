@@ -178,7 +178,7 @@ public class RepositoryApplication {
             con.setRequestProperty("X-Storage-Pass", bundle.getString("pass"));
             int status = con.getResponseCode();
             if(status != 200){
-                return ResponseEntity.status(500).build();
+                return ResponseEntity.status(status).build();
             }
             String token = con.getHeaderField("X-AUTH-TOKEN");
             String upload_url = con.getHeaderField("X-Storage-Url") + "/" + email + "/" + fileName;
