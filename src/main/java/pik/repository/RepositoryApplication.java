@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.javaswift.joss.client.factory.AccountConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,19 +15,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.xml.ws.Response;
+
 import org.springframework.http.MediaType;
 import pik.repository.mysqlDAOs.UserDAO;
 import pik.repository.oauth.JWTFilter;
 import pik.repository.oauth.LoginUsers;
-import pik.repository.util.MediaFile;
+import pik.repository.util.*;
 import pik.repository.openstack.MediaFileDAO;
 import pik.repository.openstack.SwiftMediaFileDAO;
-import pik.repository.util.Login;
-import pik.repository.util.MetadataChange;
-import pik.repository.util.UserData;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 
 
 @RestController
@@ -51,10 +58,6 @@ public class RepositoryApplication {
     public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
         FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new JWTFilter(KEY));
-        //ArrayList<String> urls = new ArrayList<>();
-        //dodanie adresów url, które są dostępne dopiero po zalogowaniu
-        //urls.add("/hello");
-        //filterRegistrationBean.setUrlPatterns(urls);
         filterRegistrationBean.addUrlPatterns("/api/*");
         return filterRegistrationBean;
     }
@@ -157,6 +160,35 @@ public class RepositoryApplication {
     public ResponseEntity get(@RequestHeader("LOGIN")  String email, @RequestParam("name") String fileName){
         List<MediaFile> results = mediaFileDAO.getAllContaining(email, fileName);
         return parseOrError(results);
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/api/upload", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity uploadObject(@RequestHeader("LOGIN")  String email, @RequestParam("fileId") String fileName){
+        if (fileName.contains(" ")){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("FileId cannot contain spaces");
+        }
+
+        ResourceBundle bundle = ResourceBundle.getBundle("swift");
+        try{
+            URL url = new URL(bundle.getString("authURL"));
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("X-Storage-User", bundle.getString("user"));
+            con.setRequestProperty("X-Storage-Pass", bundle.getString("pass"));
+            int status = con.getResponseCode();
+            if(status != 200){
+                return ResponseEntity.status(500).build();
+            }
+            String token = con.getHeaderField("X-AUTH-TOKEN");
+            String upload_url = con.getHeaderField("X-Storage-Url") + "/" + email + "/" + fileName;
+            con.disconnect();
+            UploadEndpoint uploadEndpoint = new UploadEndpoint(token, upload_url);
+            return ResponseEntity.ok(uploadEndpoint.toJson());
+
+        }catch (IOException ex){
+            return ResponseEntity.status(500).build();
+        }
     }
 
 }
