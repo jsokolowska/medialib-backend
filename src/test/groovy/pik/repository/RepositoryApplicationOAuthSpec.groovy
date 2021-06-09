@@ -23,7 +23,7 @@ class RepositoryApplicationOAuthSpec extends Specification{
     @Autowired
     private MockMvc mvc;
 
-    def "test /oauth/login - missing emai;"(){
+    def "test oauth login - missing email"(){
         expect: "status_code==400"
         mvc.perform(post("/oauth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -32,7 +32,7 @@ class RepositoryApplicationOAuthSpec extends Specification{
                 .andExpect(status().is(400))
     }
 
-    def "test /oauth/signup - wrong data"(){
+    def "test oauth signup - wrong data"(){
         expect: "status_code==400"
         mvc.perform(post("/oauth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -40,21 +40,4 @@ class RepositoryApplicationOAuthSpec extends Specification{
                 .andDo(print())
                 .andExpect(status().is(400))
     }
-
-    def "test /api/upload - right data"(){
-//        given:
-//        MvcResult token_result = mvc.perform(post("/oauth/login")
-//                                    .contentType(MediaType.APPLICATION_JSON)
-//                                    .content("{\"password\":\"asia\"}"))
-//                                    .andReturn()
-//        def token = token_result.getResponse().getContentAsString();
-//        expect:
-//        MvcResult mocRes =  mvc.perform(get("/api/upload")
-//                .param("fileId", "asdjasdwdasd.txt").header("X-API-TOKEN : token"))
-//                .andExpect(status().isOk())
-//                .andReturn()
-//        mocRes.getResponse().getContentAsString().contains("X-AUTH-TOKEN")
-//        mocRes.getResponse().getContentAsString().contains("url")
-    }
-
 }
