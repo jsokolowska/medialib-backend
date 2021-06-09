@@ -40,23 +40,12 @@ public class RepositoryApplication {
     private static final UserDAO userDAO = new UserDAO();
     private static final ObjectMapper objMapper = new ObjectMapper();
 
-    private static final String HEADER_LOGIN = "LOGIN";
     private static final String HEADER_TOKEN = "X-API-TOKEN";
     private static final String KEY = "pikKey";
-    //delete this
-    private static final String email = "asia@asia.com";
 
     public static void main(String[] args) {
         SpringApplication.run(RepositoryApplication.class, args);
     }
-
-    /*@Bean
-    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
-        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-        filterRegistrationBean.setFilter(new JWTFilter(KEY));
-        filterRegistrationBean.addUrlPatterns("/api/*");
-        return filterRegistrationBean;
-    }*/
 
     private String checkJwt(String tokenJwt){
         String nick;
@@ -88,7 +77,6 @@ public class RepositoryApplication {
             return ResponseEntity.status(401).body("error password");
         }
         String token = loginUsers.addUser(email);
-//        return ResponseEntity.ok("zaślepka");
         return ResponseEntity.ok(Jwts.builder().setSubject(email).claim("token", token).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + 1200000)).signWith(SignatureAlgorithm.HS512, KEY).compact());
     }
 
