@@ -29,18 +29,6 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         this(false);
     }
 
-    public List<MediaFile> sth(){
-        var result = new ArrayList<MediaFile>();
-        Collection<Container> containers = account.list();
-        for (Container currentContainer : containers) {
-            Collection<StoredObject> lst = currentContainer.list();
-            for(StoredObject obj : lst){
-                result.add(storedObjectToMediaFile(obj, "-"));
-            }
-        }
-        return result;
-    }
-
     /** This method does not create entry in the database.
      * To create entry use uploadMediaFile function.
      * @return file or null if does not exist */
@@ -85,8 +73,20 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
     }
 
     @Override
+    public boolean exists (String username, String fileId){
+        Container container = account.getContainer(username);
+        if(container.exists()){
+            StoredObject object = container.getObject(fileId);
+            if(object.exists()){
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Deletes entry form database if such entry exists
      * @return true if file was deleted, false otherwise*/
+    @Override
     public boolean deleteMediaFile(String userId, String fileId){
         Container container = account.getContainer(userId);
         if(container.exists()){
@@ -105,6 +105,7 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         Container container = account.getContainer(file.getUserId());
         if(!container.exists()){
             container.create();
+            container.setAndSaveMetadata("Access-Control-Allow-Origin", "http://localhost:3000");
             container.makePublic();
         }
         StoredObject object = container.getObject(file.getFileId());
@@ -167,7 +168,6 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
                 mediaFiles.add(media);
             }
         }
-
         return mediaFiles;
     }
 

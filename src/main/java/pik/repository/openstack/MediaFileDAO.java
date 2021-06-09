@@ -17,5 +17,5 @@ public interface MediaFileDAO {
     void uploadMediaFile(MediaFile file, File resource);
     boolean updateMediaFile(String username, String fileId, MetadataChange changes);
     boolean deleteMediaFile(String username, String fileId);
-
+    boolean exists(String username, String fileId);
 }
