@@ -19,7 +19,7 @@ class RepositoryApplicationTest extends Specification{
     @Autowired
     private MockMvc mvc;
 
-    def "test /oauth/login - brak e-mailu"(){
+   /* def "test /oauth/login - brak e-mailu"(){
         expect: "status_code==400"
         mvc.perform(post("/oauth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -35,5 +35,5 @@ class RepositoryApplicationTest extends Specification{
                 .content("{\"email\":\"ala\",\"name\":\"alicja\", \"surname\":\"turowska\"}"))
                 .andDo(print())
                 .andExpect(status().is(400));
-    } 
+    } */
 }
