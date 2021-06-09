@@ -2,6 +2,9 @@ package pik.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -12,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pik.repository.mysqlDAOs.UserDAO;
 import pik.repository.oauth.JWTFilter;
+import pik.repository.oauth.LoginUsers;
 import pik.repository.util.*;
 import pik.repository.openstack.MediaFileDAO;
 import pik.repository.openstack.SwiftMediaFileDAO;
@@ -21,6 +25,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -29,8 +34,8 @@ import java.util.ResourceBundle;
 @SpringBootApplication
 public class RepositoryApplication {
 
-//    @Autowired
-//    public LoginUsers loginUsers;
+    @Autowired
+    public LoginUsers loginUsers;
 
     private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
     private static final UserDAO userDAO = new UserDAO();
@@ -64,9 +69,9 @@ public class RepositoryApplication {
         if (!userDAO.isPasswordMatch(email, password)) {
             return ResponseEntity.status(401).body("error password");
         }
-//        String token = loginUsers.addUser(email);
-        return ResponseEntity.ok("zaślepka");
-//        return ResponseEntity.ok(Jwts.builder().setSubject(email).claim("token", token).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + 1200000)).signWith(SignatureAlgorithm.HS512, KEY).compact());
+        String token = loginUsers.addUser(email);
+//        return ResponseEntity.ok("zaślepka");
+        return ResponseEntity.ok(Jwts.builder().setSubject(email).claim("token", token).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + 1200000)).signWith(SignatureAlgorithm.HS512, KEY).compact());
     }
 
     @CrossOrigin
