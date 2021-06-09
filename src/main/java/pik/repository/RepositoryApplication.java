@@ -42,8 +42,8 @@ import java.util.ResourceBundle;
 @SpringBootApplication
 public class RepositoryApplication {
 
-//    @Autowired
-//    public LoginUsers loginUsers;
+    @Autowired
+    public LoginUsers loginUsers;
 
     private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
     private static final UserDAO userDAO = new UserDAO();
@@ -58,26 +58,13 @@ public class RepositoryApplication {
         SpringApplication.run(RepositoryApplication.class, args);
     }
 
-<<<<<<< HEAD
-    @CrossOrigin
-    @GetMapping("/hello")
-    public String helloUser(){
-        return "Hello user";
+    @Bean
+    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
+        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new JWTFilter(KEY));
+        filterRegistrationBean.addUrlPatterns("/api/*");
+        return filterRegistrationBean;
     }
-    @CrossOrigin
-    @GetMapping("/oauth/hello")
-    public String helloUser2(){
-        return "Hello user2";
-    }
-=======
-//    @Bean
-//    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
-//        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-//        filterRegistrationBean.setFilter(new JWTFilter(KEY));
-//        filterRegistrationBean.addUrlPatterns("/api/*");
-//        return filterRegistrationBean;
-//    }
->>>>>>> c6da38144df5c907f1c12fb598674b0b56fce598
 
     @CrossOrigin
     @RequestMapping(value="/oauth/login", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
