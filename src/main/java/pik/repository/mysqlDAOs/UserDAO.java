@@ -39,11 +39,11 @@ public class UserDAO {
     }
 
     public boolean isPasswordMatch(String email, String password) {
-        String hashedFromDB = null;
-        String saltFromDB = null;
+        String hashedFromDB;
+        String saltFromDB;
         HashMap<String,String> hashed;
 
-        String hashedPassword = null;
+        String hashedPassword;
         boolean passwordsEqual = false;
 
         try {
@@ -65,9 +65,10 @@ public class UserDAO {
     public boolean isUserExist(String email) {
 
         boolean exists = false;
-        try {
-            Statement statement = this.connection.createStatement();
-            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+
+        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        try (Statement statement = this.connection.createStatement()) {
+
 
             ResultSet rs = statement.executeQuery(queryString);
             exists = rs.next();
@@ -83,14 +84,13 @@ public class UserDAO {
 
     public User getAllUserInfo(String email) {
 
-
         String name = null;
         String surname = null;
         String userEmail = null;
 
-        try {
-            Statement statement = this.connection.createStatement();
-            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        try (Statement statement = this.connection.createStatement()) {
+
             ResultSet rs = statement.executeQuery(queryString);
 
 
@@ -113,9 +113,9 @@ public class UserDAO {
 
         int max = -1;
 
-        try {
-            Statement statement = this.connection.createStatement();
-            String queryString = "SELECT COUNT(*) AS count FROM users";
+        String queryString = "SELECT COUNT(*) AS count FROM users";
+        try (Statement statement = this.connection.createStatement()) {
+
             ResultSet rs = statement.executeQuery(queryString);
 
 
@@ -136,9 +136,9 @@ public class UserDAO {
 
         String salt = null;
 
-        try {
-            Statement statement = this.connection.createStatement();
-            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        try (Statement statement = this.connection.createStatement()) {
+
             ResultSet rs = statement.executeQuery(queryString);
 
             if (rs.next()) {
@@ -154,11 +154,11 @@ public class UserDAO {
 
 
 
-    public String getUserName(String email) throws Exception {
+    public String getUserName(String email) {
 
         String username = null;
-        try {
-            Statement statement = this.connection.createStatement();
+        try (Statement statement = this.connection.createStatement()) {
+
             String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
             ResultSet rs = statement.executeQuery(queryString);
 
@@ -175,13 +175,13 @@ public class UserDAO {
 
 
 
-    public String getLastName(String email) throws Exception {
+    public String getLastName(String email) {
 
         String lastName = null;
+        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
 
-        try {
-            Statement statement = this.connection.createStatement();
-            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        try (Statement statement = this.connection.createStatement()) {
+
             ResultSet rs = statement.executeQuery(queryString);
 
 
@@ -224,8 +224,17 @@ public class UserDAO {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        strHash = Hex.encodeHexString(hash);
-        strSalt = Hex.encodeHexString(byteSalt);
+
+
+        if (hash != null) {
+            strHash = Hex.encodeHexString(hash);
+        }
+
+        if (byteSalt != null) {
+            strSalt = Hex.encodeHexString(byteSalt);
+        }
+
+
 
         passwStuff = new HashMap<>();
         passwStuff.put("passwHash", strHash);
@@ -249,11 +258,9 @@ public class UserDAO {
         String passwordHash = passwStuff.get("passwHash");
         String strSalt = passwStuff.get("salt");
 
-        try {
+        String queryString = "INSERT INTO users(first_name, last_name, email, password_hash, seed) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(queryString)) {
 
-            String queryString = "INSERT INTO users(first_name, last_name, email, password_hash, seed) VALUES (?, ?, ?, ?, ?)";
-
-            PreparedStatement statement = connection.prepareStatement(queryString);
             statement.setString(1, firstName);
             statement.setString(2, lastName);
             statement.setString(3, email);
@@ -274,9 +281,10 @@ public class UserDAO {
     public String getPasswordHash(String email) {
 
         String hash = null;
-        try {
-            Statement statement = this.connection.createStatement();
-            String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+
+        String queryString = String.format("SELECT * FROM users WHERE email = \"%s\"", email);
+        try (Statement statement = this.connection.createStatement()) {
+
             ResultSet rs = statement.executeQuery(queryString);
 
 
@@ -292,10 +300,10 @@ public class UserDAO {
 
     public void modifyUserEmail(String email, String newEmail) {
 
-        try {
-            String queryString = "UPDATE users SET email = ? WHERE email = ?";
+        String queryString = "UPDATE users SET email = ? WHERE email = ?";
 
-            PreparedStatement statement = this.connection.prepareStatement(queryString);
+        try (PreparedStatement statement = this.connection.prepareStatement(queryString)) {
+
             statement.setString(1, newEmail);
             statement.setString(2, email);
 
@@ -307,10 +315,10 @@ public class UserDAO {
 
     public void modifyAllData(String email, String name, String surname, String newEmail) {
 
-        try {
-            String queryString = "UPDATE users SET email = ?, first_name = ?, last_name = ? WHERE email = ?";
+        String queryString = "UPDATE users SET email = ?, first_name = ?, last_name = ? WHERE email = ?";
 
-            PreparedStatement statement = this.connection.prepareStatement(queryString);
+        try (PreparedStatement statement = this.connection.prepareStatement(queryString)) {
+
             statement.setString(1, newEmail);
             statement.setString(2, name);
             statement.setString(3, surname);
@@ -326,10 +334,10 @@ public class UserDAO {
 
     public void deleteUser(String email) {
 
-        try {
+        String queryString = String.format("DELETE FROM users WHERE email = \"%s\"", email);
 
-            String queryString = String.format("DELETE FROM users WHERE email = \"%s\"", email);
-            Statement statement = this.connection.createStatement();
+        try (Statement statement = this.connection.createStatement()) {
+
             statement.execute(queryString);
             statement.execute("commit;");
 
