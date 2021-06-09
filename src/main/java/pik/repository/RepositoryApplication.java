@@ -9,23 +9,17 @@ import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pik.repository.mysqlDAOs.UserDAO;
-//import pik.repository.oauth.JWTFilter;
 import pik.repository.oauth.LoginUsers;
-import pik.repository.oauth.MutableHTTPServletRequest;
 import pik.repository.util.*;
 import pik.repository.openstack.MediaFileDAO;
 import pik.repository.openstack.SwiftMediaFileDAO;
 import pik.repository.util.*;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -72,7 +66,6 @@ public class RepositoryApplication {
             try {
                 Claims claims = Jwts.parser().setSigningKey(KEY).parseClaimsJws(tokenJwt).getBody();
                 nick = claims.getSubject();
-                //String token =
             } catch (final SignatureException e) {
                 return "";
             }
@@ -113,7 +106,7 @@ public class RepositoryApplication {
     @GetMapping(value = "/api/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAll(@RequestHeader(HEADER_TOKEN) String token, @RequestParam("type") String type) {
         String email = checkJwt(token);
-        if(email == ""){
+        if(email.equals("")){
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         if (!(type.equals("any") || type.equals("video") || type.equals("image"))) {
@@ -129,7 +122,11 @@ public class RepositoryApplication {
 
     @CrossOrigin
     @GetMapping(value = "/api/file/{fileId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getOneById(/*@RequestHeader(HEADER_LOGIN) String email,*/ @PathVariable String fileId) {
+    public ResponseEntity getOneById(@RequestHeader(HEADER_TOKEN) String token, @PathVariable String fileId) {
+        String email = checkJwt(token);
+        if(email.equals("")){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
         return getOne(email, fileId, null);
     }
 
@@ -162,7 +159,11 @@ public class RepositoryApplication {
 
     @CrossOrigin
     @DeleteMapping("/api/file/{fileId}")
-    public ResponseEntity deleteFile(/*@RequestHeader(HEADER_LOGIN) String email,*/ @PathVariable String fileId) {
+    public ResponseEntity deleteFile(@RequestHeader(HEADER_TOKEN) String token, @PathVariable String fileId) {
+        String email = checkJwt(token);
+        if(email.equals("")){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
         boolean success = mediaFileDAO.deleteMediaFile(email, fileId);
         if (success) {
             return ResponseEntity.ok().build();
@@ -172,8 +173,12 @@ public class RepositoryApplication {
 
     @CrossOrigin
     @PostMapping("/api/file/{fileId}")
-    public ResponseEntity updateMetadata(/*@RequestHeader(HEADER_LOGIN)  String email*/ @PathVariable String fileId,
+    public ResponseEntity updateMetadata(@RequestHeader(HEADER_TOKEN)  String token, @PathVariable String fileId,
                                                                                         @RequestBody @Valid MetadataChange data) {
+        String email = checkJwt(token);
+        if(email.equals("")){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
         boolean success = mediaFileDAO.updateMediaFile(email, fileId, data);
         if (success) {
             return ResponseEntity.ok().build();
@@ -183,15 +188,22 @@ public class RepositoryApplication {
 
     @CrossOrigin
     @GetMapping(value = "/api/find", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity get(/*@RequestHeader("LOGIN")  String email,*/ @RequestParam("name") String fileName) {
+    public ResponseEntity get(@RequestHeader(HEADER_TOKEN)  String token, @RequestParam("name") String fileName) {
+        String email = checkJwt(token);
+        if(email.equals("")){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
         List<MediaFile> results = mediaFileDAO.getAllContaining(email, fileName);
         return parseOrError(results);
     }
 
     @CrossOrigin
     @GetMapping(value = "/api/upload", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity uploadObject(/*@RequestHeader("LOGIN")  String email*/ @RequestParam("fileId") String fileName) {
-
+    public ResponseEntity uploadObject(@RequestHeader(HEADER_TOKEN)  String tokenJwt, @RequestParam("fileId") String fileName) {
+        String email = checkJwt(tokenJwt);
+        if(email.equals("")){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
         if (fileName.contains(" ")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("FileId cannot contain spaces");
         }

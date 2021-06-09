@@ -39,15 +39,15 @@ class RepositoryApplicationSpec extends Specification{
                 .andExpect(status().is(400));
     }
 
-    def "test /api/upload - right data"(){
-        expect:
-        MvcResult mocRes =  mvc.perform(get("/api/upload")
-                .param("fileId", "asdjasdwdasd.txt"))
-                .andExpect(status().isOk())
-                .andReturn()
-        mocRes.getResponse().getContentAsString().contains("X-AUTH-TOKEN")
-        mocRes.getResponse().getContentAsString().contains("url")
-    }
+    //def "test /api/upload - right data"(){
+    //    expect:
+    //    MvcResult mocRes =  mvc.perform(get("/api/upload")
+    //            .param("fileId", "asdjasdwdasd.txt"))
+    //            .andExpect(status().isOk())
+    //            .andReturn()
+    //    mocRes.getResponse().getContentAsString().contains("X-AUTH-TOKEN")
+    //    mocRes.getResponse().getContentAsString().contains("url")
+    //}
 
     def "test /api/upload - wrong data"(){
         expect:
