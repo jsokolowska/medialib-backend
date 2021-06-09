@@ -2,8 +2,10 @@ package pik.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,13 +16,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pik.repository.mysqlDAOs.UserDAO;
-import pik.repository.oauth.JWTFilter;
+//import pik.repository.oauth.JWTFilter;
 import pik.repository.oauth.LoginUsers;
+import pik.repository.oauth.MutableHTTPServletRequest;
 import pik.repository.util.*;
 import pik.repository.openstack.MediaFileDAO;
 import pik.repository.openstack.SwiftMediaFileDAO;
 import pik.repository.util.*;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -42,6 +47,7 @@ public class RepositoryApplication {
     private static final ObjectMapper objMapper = new ObjectMapper();
 
     private static final String HEADER_LOGIN = "LOGIN";
+    private static final String HEADER_TOKEN = "X-API-TOKEN";
     private static final String KEY = "pikKey";
     //delete this
     private static final String email = "asia@asia.com";
@@ -50,12 +56,31 @@ public class RepositoryApplication {
         SpringApplication.run(RepositoryApplication.class, args);
     }
 
-    @Bean
+    /*@Bean
     public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
         FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new JWTFilter(KEY));
         filterRegistrationBean.addUrlPatterns("/api/*");
         return filterRegistrationBean;
+    }*/
+
+    private String checkJwt(String tokenJwt){
+        String nick;
+        if (tokenJwt == null) {
+            return "";
+        } else {
+            try {
+                Claims claims = Jwts.parser().setSigningKey(KEY).parseClaimsJws(tokenJwt).getBody();
+                nick = claims.getSubject();
+                //String token =
+            } catch (final SignatureException e) {
+                return "";
+            }
+        }
+        if(loginUsers.checkUser(nick)){
+            return nick;
+        }
+        return "";
     }
 
     @CrossOrigin
@@ -86,7 +111,11 @@ public class RepositoryApplication {
 
     @CrossOrigin
     @GetMapping(value = "/api/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getAll(/*@RequestHeader(HEADER_LOGIN) String email*/ @RequestParam("type") String type) {
+    public ResponseEntity getAll(@RequestHeader(HEADER_TOKEN) String token, @RequestParam("type") String type) {
+        String email = checkJwt(token);
+        if(email == ""){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
         if (!(type.equals("any") || type.equals("video") || type.equals("image"))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

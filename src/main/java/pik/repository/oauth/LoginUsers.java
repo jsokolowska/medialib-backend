@@ -21,6 +21,12 @@ public class LoginUsers{
         String userToken = loginUser.get(email);
         return userToken != null && userToken.equals(token);
     }
+
+    public boolean checkUser(String email){
+        String userToken = loginUser.get(email);
+        return userToken != null;
+    }
+
     public String addUser(String email){
         String token = generateToken(email);
         loginUser.put(email, token);
