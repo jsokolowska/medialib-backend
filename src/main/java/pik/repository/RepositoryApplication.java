@@ -203,6 +203,11 @@ public class RepositoryApplication {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("FileId already exists");
         }
 
+        mediaFileDAO.uploadMediaFile(email, fileName);
+
+        if(mediaFileDAO.exists(email, fileName)){
+            return ResponseEntity.status(400).build();
+        }
         ResourceBundle bundle = ResourceBundle.getBundle("swift");
         try {
             URL url = new URL(bundle.getString("authURL"));

@@ -14,6 +14,7 @@ public interface MediaFileDAO {
     List<MediaFile> getAllByUser (String userId);
     List<MediaFile> getAllContaining (String userId, String name);
 
+    void uploadMediaFile(String user_id, String file_id);
     void uploadMediaFile(MediaFile file, File resource);
     boolean updateMediaFile(String username, String fileId, MetadataChange changes);
     boolean deleteMediaFile(String username, String fileId);

@@ -6,11 +6,16 @@ import org.javaswift.joss.client.factory.AuthenticationMethod;
 import org.javaswift.joss.model.Account;
 import org.javaswift.joss.model.Container;
 import org.javaswift.joss.model.StoredObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pik.repository.util.MediaFile;
 import pik.repository.util.MetadataChange;
+import pik.repository.util.UploadEndpoint;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 @Service
@@ -104,16 +109,55 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
 
     /** Creates new entry in Swift database */
     @Override
+    public void uploadMediaFile(String user_id, String file_id){
+        Container container = account.getContainer(user_id);
+        if(!container.exists()){
+            container.create();
+            container.makePublic();
+            set_cors(user_id);
+        }
+//        StoredObject object = container.getObject(file.getFileId());
+//        object.uploadObject(resource);
+//        object.setAndSaveMetadata(DISPLAY_NAME, file.getDisplayName());
+    }
     public void uploadMediaFile(MediaFile file, File resource){
         Container container = account.getContainer(file.getUserId());
         if(!container.exists()){
             container.create();
-            container.setAndSaveMetadata("Access-Control-Allow-Origin", "http://localhost:3000");
             container.makePublic();
         }
         StoredObject object = container.getObject(file.getFileId());
         object.uploadObject(resource);
         object.setAndSaveMetadata(DISPLAY_NAME, file.getDisplayName());
+    }
+
+    private void set_cors(String user_id){
+        ResourceBundle bundle = ResourceBundle.getBundle("swift");
+        try {
+            URL url = new URL(bundle.getString("authURL"));
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("X-Storage-User", bundle.getString("user"));
+            con.setRequestProperty("X-Storage-Pass", bundle.getString("pass"));
+            int status = con.getResponseCode();
+            if (status != 200) {
+                return;
+            }
+            String token = con.getHeaderField("X-AUTH-TOKEN");
+            String container_url = con.getHeaderField("X-Storage-Url") + "/" + user_id;
+            con.disconnect();
+
+            URL cUrl = new URL(container_url);
+            HttpURLConnection connection = (HttpURLConnection) cUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("X-Auth-Token", token);
+            connection.setRequestProperty("Origin", "http://localhost:3000");
+            connection.setRequestProperty("X-Container-Meta-Access-Control-Allow-Origin", "http://localhost:3000");
+            int st = connection.getResponseCode();
+            connection.disconnect();
+
+        } catch (IOException ignored) {}
+
     }
 
     @Override
