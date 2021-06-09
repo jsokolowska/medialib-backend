@@ -3,6 +3,7 @@ package pik.repository.oauth;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureException;
+import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -12,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-public class JWTFilter implements javax.servlet.Filter {
+public class JWTFilter extends GenericFilterBean {
 
     private static final String HEADER_TOKEN = "X-API-TOKEN";
     private String key;

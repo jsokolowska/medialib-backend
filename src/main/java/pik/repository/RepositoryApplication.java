@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import org.springframework.http.MediaType;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pik.repository.mysqlDAOs.UserDAO;
 import pik.repository.oauth.JWTFilter;
 import pik.repository.oauth.LoginUsers;
@@ -47,16 +49,15 @@ public class RepositoryApplication {
         SpringApplication.run(RepositoryApplication.class, args);
     }
 
-    @Bean
-    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
-        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-        filterRegistrationBean.setFilter(new JWTFilter(KEY));
-        //ArrayList<String> urls = new ArrayList<>();
-        //dodanie adresów url, które są dostępne dopiero po zalogowaniu
-        //urls.add("/hello");
-        //filterRegistrationBean.setUrlPatterns(urls);
-        filterRegistrationBean.addUrlPatterns("/api/*");
-        return filterRegistrationBean;
+    @CrossOrigin
+    @GetMapping("/hello")
+    public String helloUser(){
+        return "Hello user";
+    }
+    @CrossOrigin
+    @GetMapping("/oauth/hello")
+    public String helloUser2(){
+        return "Hello user2";
     }
 
     @CrossOrigin
