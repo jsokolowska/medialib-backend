@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.MediaType;
 import pik.repository.mysqlDAOs.UserDAO;
+import pik.repository.oauth.JWTFilter;
 import pik.repository.util.*;
 import pik.repository.openstack.MediaFileDAO;
 import pik.repository.openstack.SwiftMediaFileDAO;
@@ -43,13 +46,13 @@ public class RepositoryApplication {
         SpringApplication.run(RepositoryApplication.class, args);
     }
 
-//    @Bean
-//    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
-//        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-//        filterRegistrationBean.setFilter(new JWTFilter(KEY));
-//        filterRegistrationBean.addUrlPatterns("/api/*");
-//        return filterRegistrationBean;
-//    }
+    @Bean
+    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
+        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new JWTFilter(KEY));
+        filterRegistrationBean.addUrlPatterns("/api/*");
+        return filterRegistrationBean;
+    }
 
     @CrossOrigin
     @RequestMapping(value="/oauth/login", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
