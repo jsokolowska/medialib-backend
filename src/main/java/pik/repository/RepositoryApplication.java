@@ -2,38 +2,21 @@ package pik.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.javaswift.joss.client.factory.AccountConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import javax.xml.ws.Response;
-
-import org.springframework.http.MediaType;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pik.repository.mysqlDAOs.UserDAO;
-import pik.repository.oauth.JWTFilter;
-import pik.repository.oauth.LoginUsers;
-import pik.repository.util.*;
 import pik.repository.openstack.MediaFileDAO;
 import pik.repository.openstack.SwiftMediaFileDAO;
+import pik.repository.util.*;
 
-import java.io.BufferedReader;
+import javax.validation.Valid;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -42,8 +25,8 @@ import java.util.ResourceBundle;
 @SpringBootApplication
 public class RepositoryApplication {
 
-    @Autowired
-    public LoginUsers loginUsers;
+//    @Autowired
+//    public LoginUsers loginUsers;
 
     private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
     private static final UserDAO userDAO = new UserDAO();
@@ -58,13 +41,13 @@ public class RepositoryApplication {
         SpringApplication.run(RepositoryApplication.class, args);
     }
 
-    @Bean
-    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
-        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-        filterRegistrationBean.setFilter(new JWTFilter(KEY));
-        filterRegistrationBean.addUrlPatterns("/api/*");
-        return filterRegistrationBean;
-    }
+//    @Bean
+//    public FilterRegistrationBean<JWTFilter> filterRegistrationBean(){
+//        FilterRegistrationBean<JWTFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+//        filterRegistrationBean.setFilter(new JWTFilter(KEY));
+//        filterRegistrationBean.addUrlPatterns("/api/*");
+//        return filterRegistrationBean;
+//    }
 
     @CrossOrigin
     @RequestMapping(value="/oauth/login", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
@@ -198,5 +181,3 @@ public class RepositoryApplication {
     }
 
 }
-
-
