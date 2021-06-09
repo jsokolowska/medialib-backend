@@ -57,8 +57,10 @@ class SwiftMediaFileDAOSpec extends Specification {
         }
     }
 
-    /*def "Should allow for display name to change"(){
+    def "Should allow for display name to change"(){
+        //works with non-mock swift dao because of implementation bug that does not refresh metadata
         given:
+        def swiftDAO = new SwiftMediaFileDAO(false)
         def fileId = "test-img1.jpg"
         def displayName = "displayName"
         swiftDAO.uploadMediaFile(new MediaFile(username, fileId, fileId), new File(resDir + fileId))
@@ -72,8 +74,7 @@ class SwiftMediaFileDAOSpec extends Specification {
         then:
         result.getDisplayName() == displayName
         print(result)
-
-    }*/
+    }
 
     def displayNameChangeSetup(String [] filenames, String [] displayNames){
         for (int i=0; i<filenames.size(); i++){
@@ -93,6 +94,18 @@ class SwiftMediaFileDAOSpec extends Specification {
         swiftDAO.getAllContaining( username, "display").size() == 2
     }
 
+    def "Should allow to find file by exactly its display name"(){
+        given:
+        String [] names= ["test-gif.gif", "test-img1.jpg", "test-img2.jpeg"]
+        String [] displayNames = ["how is display1", "display2 is thee", "not"]
+        displayNameChangeSetup(names, displayNames)
+
+        expect:
+        displayNames.each {
+            swiftDAO.getMediaFileByDisplayName(username, it) != null
+        }
+    }
+
     def "Should list all images in container"(){
         given:
         String [] names= ["test-gif.gif", "test-img1.jpg", "test-img2.jpeg","test-img3.png", "test-video.mp4"]
@@ -108,8 +121,6 @@ class SwiftMediaFileDAOSpec extends Specification {
         list.find {it -> it.getFileId() == names[2]}
         list.find {it -> it.getFileId() == names[3]}
 
-        cleanup:
-        cleanup()
     }
 
     def "Should list all videos in container"(){
@@ -124,8 +135,6 @@ class SwiftMediaFileDAOSpec extends Specification {
         list.size() == 1
         list.find {it -> it.getFileId() == names[4]}
 
-        cleanup:
-        cleanup()
     }
 
     def "Should delete files"(){
@@ -140,15 +149,28 @@ class SwiftMediaFileDAOSpec extends Specification {
         then:
         list.size() == 1
         list[0].getFileId() == names[0]
+    }
 
-        cleanup:
-        cleanup()
+    def "Should check if file exists"(){
+        given:
+        String [] names= ["test-img1.jpg", "test-img2.jpeg"]
+        uploadAllFiles(names)
+
+        expect:
+        names.each {
+            swiftDAO.exists(username, it)
+        }
+        !swiftDAO.exists(username, "some random name")
+    }
+
+    def "Should find media files by their display name"(){
+
     }
 
     def cleanup(){
         def files_listed = swiftDAO.getAllByUser(username)
-        for (int i=0; i< files_listed.size(); i++){
-            swiftDAO.deleteMediaFile(username, files_listed[i].getFileId())
+        files_listed.each {
+            swiftDAO.deleteMediaFile(username, it.getFileId())
         }
     }
 }
