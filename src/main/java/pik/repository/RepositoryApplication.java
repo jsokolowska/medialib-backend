@@ -184,7 +184,6 @@ public class RepositoryApplication {
     @CrossOrigin
     @GetMapping(value = "/api/find", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity get(/*@RequestHeader("LOGIN")  String email,*/ @RequestParam("name") String fileName) {
-
         List<MediaFile> results = mediaFileDAO.getAllContaining(email, fileName);
         return parseOrError(results);
     }
