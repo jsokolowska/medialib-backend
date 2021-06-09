@@ -29,11 +29,11 @@ class RepositoryApplicationTestNotSpock {
                 .andDo(print())
                 .andExpect(status().isOk());*/
 
-        this.mocMvc.perform(post("/oauth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"password\":\"12345\"}"))
-                .andDo(print())
-                .andExpect(status().is(400));
+//        this.mocMvc.perform(post("/oauth/login")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content("{\"password\":\"12345\"}"))
+//                .andDo(print())
+//                .andExpect(status().is(400));
 
 
         /*this.mocMvc.perform(post("/api/signup")
@@ -42,11 +42,11 @@ class RepositoryApplicationTestNotSpock {
                 .andDo(print())
                 .andExpect(status().isOk());*/
 
-        this.mocMvc.perform(post("/oauth/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\":\"ala\",\"name\":\"alicja\", \"surname\":\"turowska\"}"))
-                .andDo(print())
-                .andExpect(status().is(400));
+//        this.mocMvc.perform(post("/oauth/signup")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content("{\"email\":\"ala\",\"name\":\"alicja\", \"surname\":\"turowska\"}"))
+//                .andDo(print())
+//                .andExpect(status().is(400));
     }
 
 }
