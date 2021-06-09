@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class RepositoryApplicationSpec extends Specification{
+class RepositoryApplicationOAuthSpec extends Specification{
 
     @Autowired
     private MockMvc mvc;
@@ -39,20 +39,14 @@ class RepositoryApplicationSpec extends Specification{
                 .andExpect(status().is(400));
     }
 
-    //def "test /api/upload - right data"(){
-    //    expect:
-    //    MvcResult mocRes =  mvc.perform(get("/api/upload")
-    //            .param("fileId", "asdjasdwdasd.txt"))
-    //            .andExpect(status().isOk())
-    //            .andReturn()
-    //    mocRes.getResponse().getContentAsString().contains("X-AUTH-TOKEN")
-    //    mocRes.getResponse().getContentAsString().contains("url")
-    //}
-
-    def "test /api/upload - wrong data"(){
+    def "test /api/upload - right data"(){
         expect:
-        mvc.perform(get("/api/upload")
-                .param("fileId", "asdjasd wdasd.txt"))
-                .andExpect(status().is(400))
+        MvcResult mocRes =  mvc.perform(get("/api/upload")
+                .param("fileId", "asdjasdwdasd.txt").header("X-API-TOKEN : token"))
+                .andExpect(status().isOk())
+                .andReturn()
+        mocRes.getResponse().getContentAsString().contains("X-AUTH-TOKEN")
+        mocRes.getResponse().getContentAsString().contains("url")
     }
+
 }

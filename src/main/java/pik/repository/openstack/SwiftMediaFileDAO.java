@@ -6,12 +6,14 @@ import org.javaswift.joss.client.factory.AuthenticationMethod;
 import org.javaswift.joss.model.Account;
 import org.javaswift.joss.model.Container;
 import org.javaswift.joss.model.StoredObject;
+import org.springframework.stereotype.Service;
 import pik.repository.util.MediaFile;
 import pik.repository.util.MetadataChange;
 
 import java.io.File;
 import java.util.*;
 
+@Service
 public class SwiftMediaFileDAO implements MediaFileDAO {
     private final String DISPLAY_NAME = "display-name";
     private final Account account;
@@ -25,6 +27,7 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         config.setAuthenticationMethod(AuthenticationMethod.BASIC);
         account = new AccountFactory(config).setMock(mock).createAccount();
     }
+
     public SwiftMediaFileDAO(){
         this(false);
     }

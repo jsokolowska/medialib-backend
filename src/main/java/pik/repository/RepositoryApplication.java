@@ -33,10 +33,8 @@ import java.util.ResourceBundle;
 @SpringBootApplication
 public class RepositoryApplication {
 
-    @Autowired
     public LoginUsers loginUsers;
-
-    private static final MediaFileDAO mediaFileDAO = new SwiftMediaFileDAO();
+    private final MediaFileDAO mediaFileDAO;
     private static final UserDAO userDAO = new UserDAO();
     private static final ObjectMapper objMapper = new ObjectMapper();
 
@@ -45,6 +43,12 @@ public class RepositoryApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(RepositoryApplication.class, args);
+    }
+
+    @Autowired
+    public RepositoryApplication(SwiftMediaFileDAO swiftMediaFileDAO, LoginUsers loginUsers){
+        this.loginUsers = loginUsers;
+        mediaFileDAO = swiftMediaFileDAO;
     }
 
     private String checkJwt(String tokenJwt){
