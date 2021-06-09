@@ -1,5 +1,7 @@
 package pik.repository
 
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -27,7 +29,7 @@ class RepositoryApplicationOAuthSpec extends Specification{
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"password\":\"12345\"}"))
                 .andDo(print())
-                .andExpect(status().is(400));
+                .andExpect(status().is(400))
     }
 
     def "test /oauth/signup - wrong data"(){
@@ -36,17 +38,23 @@ class RepositoryApplicationOAuthSpec extends Specification{
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\":\"ala\",\"name\":\"alicja\", \"surname\":\"turowska\"}"))
                 .andDo(print())
-                .andExpect(status().is(400));
+                .andExpect(status().is(400))
     }
 
     def "test /api/upload - right data"(){
-        expect:
-        MvcResult mocRes =  mvc.perform(get("/api/upload")
-                .param("fileId", "asdjasdwdasd.txt").header("X-API-TOKEN : token"))
-                .andExpect(status().isOk())
-                .andReturn()
-        mocRes.getResponse().getContentAsString().contains("X-AUTH-TOKEN")
-        mocRes.getResponse().getContentAsString().contains("url")
+//        given:
+//        MvcResult token_result = mvc.perform(post("/oauth/login")
+//                                    .contentType(MediaType.APPLICATION_JSON)
+//                                    .content("{\"password\":\"asia\"}"))
+//                                    .andReturn()
+//        def token = token_result.getResponse().getContentAsString();
+//        expect:
+//        MvcResult mocRes =  mvc.perform(get("/api/upload")
+//                .param("fileId", "asdjasdwdasd.txt").header("X-API-TOKEN : token"))
+//                .andExpect(status().isOk())
+//                .andReturn()
+//        mocRes.getResponse().getContentAsString().contains("X-AUTH-TOKEN")
+//        mocRes.getResponse().getContentAsString().contains("url")
     }
 
 }
