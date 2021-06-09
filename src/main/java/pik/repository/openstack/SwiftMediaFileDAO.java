@@ -6,12 +6,14 @@ import org.javaswift.joss.client.factory.AuthenticationMethod;
 import org.javaswift.joss.model.Account;
 import org.javaswift.joss.model.Container;
 import org.javaswift.joss.model.StoredObject;
+import org.springframework.stereotype.Service;
 import pik.repository.util.MediaFile;
 import pik.repository.util.MetadataChange;
 
 import java.io.File;
 import java.util.*;
 
+@Service
 public class SwiftMediaFileDAO implements MediaFileDAO {
     private final String DISPLAY_NAME = "display-name";
     private final Account account;
@@ -25,20 +27,9 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         config.setAuthenticationMethod(AuthenticationMethod.BASIC);
         account = new AccountFactory(config).setMock(mock).createAccount();
     }
+
     public SwiftMediaFileDAO(){
         this(false);
-    }
-
-    public List<MediaFile> sth(){
-        var result = new ArrayList<MediaFile>();
-        Collection<Container> containers = account.list();
-        for (Container currentContainer : containers) {
-            Collection<StoredObject> lst = currentContainer.list();
-            for(StoredObject obj : lst){
-                result.add(storedObjectToMediaFile(obj, "-"));
-            }
-        }
-        return result;
     }
 
     /** This method does not create entry in the database.
@@ -85,8 +76,20 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
     }
 
     @Override
+    public boolean exists (String username, String fileId){
+        Container container = account.getContainer(username);
+        if(container.exists()){
+            StoredObject object = container.getObject(fileId);
+            if(object.exists()){
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Deletes entry form database if such entry exists
      * @return true if file was deleted, false otherwise*/
+    @Override
     public boolean deleteMediaFile(String userId, String fileId){
         Container container = account.getContainer(userId);
         if(container.exists()){
@@ -105,6 +108,7 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
         Container container = account.getContainer(file.getUserId());
         if(!container.exists()){
             container.create();
+            container.setAndSaveMetadata("Access-Control-Allow-Origin", "http://localhost:3000");
             container.makePublic();
         }
         StoredObject object = container.getObject(file.getFileId());
@@ -162,12 +166,11 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
 
         for(StoredObject object : container.list()){
             String displayName = (String) object.getMetadata(DISPLAY_NAME);
-            if(displayName.contains(name)){
+            if(displayName != null && displayName.contains(name)){
                 MediaFile media = storedObjectToMediaFile(object, userId);
                 mediaFiles.add(media);
             }
         }
-
         return mediaFiles;
     }
 

@@ -10,6 +10,6 @@ public class UploadEndpoint {
     }
 
     public String toJson(){
-        return String.format("{ \"X-AUTH-TOKEN\" : \"%s\",  \"url\" : \"%s\"", X_AUTH_Token, url);
+        return String.format("{ \"X-AUTH-TOKEN\" : \"%s\",  \"url\" : \"%s\"}", X_AUTH_Token, url);
     }
 }
