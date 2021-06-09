@@ -162,7 +162,7 @@ public class SwiftMediaFileDAO implements MediaFileDAO {
 
         for(StoredObject object : container.list()){
             String displayName = (String) object.getMetadata(DISPLAY_NAME);
-            if(displayName.contains(name)){
+            if(displayName != null && displayName.contains(name)){
                 MediaFile media = storedObjectToMediaFile(object, userId);
                 mediaFiles.add(media);
             }
